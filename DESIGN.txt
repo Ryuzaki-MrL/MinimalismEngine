@@ -1,0 +1,41 @@
+TODO: load resources from a filename list for each platform
+
+Animations:
+Load alongside spritedata (same RZDB)
+Contains: list of sprite ids
+
+
+TODO:
+- make Renderer a private namespace
+- separate screen size from SDL code
+- platform-specific coordinate typedef (float, int, etc)
+  - to avoid typecast when rendering
+- better resource management
+- extendable classes (tilemap, geometry, etc)
+- network features (friends, achievements, etc)
+  - Network::init flags (NETWORK_FEAT_*; FRIENDS, TROPHIES, etc)
+  - use frd service on 3DS
+  - option to use steam API on PC
+
+
+Minimalism Editor:
+Create or load a project folder containing
+ -game settings
+  -title
+  -target platforms (checkboxes)
+  -custom entity properties and components
+  -engine settings overrides (entity pool size, etc)
+ -data files
+  -text database and metadata (same file)
+  -entity database and metadata (separate files)
+  -sprite database and metadata (separate files)
+  -SDL spritesheet editor
+
+Editors:
+Text, sprite data, entity data
+Custom game editors (plugins)
+Entity code editor (generates the .h and .cpp files)
+
+Data files are stored at the project's root, but if a file of same
+name is found within a target platform's folder, it will be used
+instead when building the game for that platform.
