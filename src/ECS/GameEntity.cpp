@@ -54,7 +54,22 @@ bool GameEntity::applyVector(bool checksolid) {
 	return true;
 }
 
+void GameEntity::pauseTimers() {
+	for (uint8_t i = 0; i < ENTITY_TIMERS; ++i) {
+		timers[i].pause();
+	}
+}
+
+void GameEntity::resetTimers() {
+	for (uint8_t i = 0; i < ENTITY_TIMERS; ++i) {
+		timers[i].reset();
+	}
+}
+
 void GameEntity::update() {
+	for (uint8_t i = 0; i < ENTITY_TIMERS; ++i) {
+		if (timers[i].complete()) onTimeOut(i);
+	}
 	comps.update();
 	onUpdate();
 }

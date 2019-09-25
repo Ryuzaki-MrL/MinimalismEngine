@@ -4,7 +4,9 @@
 #include "System.h"
 #include "Graphics.h"
 
-Game::Game(): framecnt(0), lasttime(System::getTime()), state(nullptr), running(true), transition(false) {}
+Game::Game(): framecnt(0), state(nullptr), running(true), transition(false) {
+	frametimer.start(1.0);
+}
 
 Game::~Game() {
 	delete state;
@@ -40,13 +42,13 @@ void Game::draw() {
 	state->draw();
 	Renderer::frameEnd();
 
-	// calculate fps (debug)
+	// fps
 	++framecnt;
-	uint64_t delta = System::getTime() - lasttime;
-	if (delta > 1000) {
-		fps = framecnt / (delta / 1000.0f);
+	seconds_t delta = frametimer.elapsed();
+	if (delta >= 1.0) {
+		fps = framecnt / delta;
 		framecnt = 0;
-		lasttime = System::getTime();
+		frametimer.reset();
 	}
 }
 

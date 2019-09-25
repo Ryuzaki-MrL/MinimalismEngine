@@ -7,14 +7,18 @@
 #include "Geometry.h"
 #include "Sprite.h"
 
+#define ENTITY_TIMERS	1
+
 #define EFLAG_DEAD		0b00000001
 #define EFLAG_VISIBLE	0b00000010
 #define EFLAG_SOLID		0b00000100
 
 class Scene;
 class GameEntity {
-  protected:
+  public:
 	Components comps;
+  protected:
+	Timer timers[ENTITY_TIMERS];
 	Sprite spr;
 	Rectangle bbox;
 	Vector2D v;
@@ -34,6 +38,7 @@ class GameEntity {
 
 	virtual void onMove() {}
 	virtual void onInteract(GameEntity& /* other */) {}
+	virtual void onTimeOut(uint8_t /* timer */) {}
 
   public:
 	GameEntity(Scene& scene, uint16_t type);
@@ -70,6 +75,9 @@ class GameEntity {
 
 	inline bool collideWith(const Rectangle& r) const { return r.collideWith(getBoundingBox()); }
 	inline bool collideWith(const GameEntity& obj) const { return obj.collideWith(getBoundingBox()); }
+
+	void pauseTimers();
+	void resetTimers();
 
 	void update();
 	void draw();

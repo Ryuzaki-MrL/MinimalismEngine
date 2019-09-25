@@ -1,12 +1,12 @@
 #ifndef GAME_H
 #define GAME_H
 
-#define UNITS_PER_FRAME(x, d) ((x) * (d))
+#define UNITS_PER_FRAME(x, t) ((x) * (t))
 
 class GameState;
 class Game {
   private:
-	uint64_t lasttime;
+	Timer frametimer;
 	uint16_t framecnt;
 	float fps;
 	GameState* state;
