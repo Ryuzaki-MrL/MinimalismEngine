@@ -3,15 +3,19 @@
 
 #define GET_SECTION(x, y) (((((y) / sec_height) * sec_cols) + ((x) / sec_width)) % (sec_cols * sec_rows))
 
-Tilemap::Tilemap(uint32_t mw, uint32_t mh, uint32_t sw, uint32_t sh): sec_width(sw), sec_height(sh) {
-	sec_rows = ((mh / sh) + 1);
-	sec_cols = ((mw / sw) + 1);
-	sections = new TileMapSection[sec_rows * sec_cols];
-}
+Tilemap::Tilemap(): sections(nullptr) {}
 
 Tilemap::~Tilemap() {
 	Renderer::destroyTarget(cached);
-	delete sections;
+	if (sections) delete sections;
+}
+
+void Tilemap::create(uint32_t mw, uint32_t mh, uint32_t sw, uint32_t sh) {
+	sec_width = sw;
+	sec_height = sh;
+	sec_rows = ((mh / sh) + 1);
+	sec_cols = ((mw / sw) + 1);
+	sections = new TileMapSection[sec_rows * sec_cols];
 }
 
 void Tilemap::tileAdd(const Tile& tile) {

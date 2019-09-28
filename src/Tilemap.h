@@ -30,8 +30,10 @@ class TileMap {
 	uint8_t sec_cols;
 
   public:
-	TileMap(uint32_t mw, uint32_t mh, uint32_t sw, uint32_t sh);
+	TileMap();
 	~TileMap();
+
+	void create(uint32_t mw, uint32_t mh, uint32_t sw, uint32_t sh);
 
 	void tileAdd(const Tile& tile);
 	const TileMapSection& getSection(uint32_t x, uint32_t y) const;
