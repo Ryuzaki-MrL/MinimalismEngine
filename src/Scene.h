@@ -8,12 +8,20 @@
 #include "ObjectPool.h"
 #include "Tilemap.h"
 
+// Generic bbox collision
+struct SceneCollision {
+	Rectangle bbox;
+	uint16_t flags;
+};
+
 typedef std::function<void(GameEntity&)> EntityFn;
+typedef std::vector<SceneCollision> CollisionMap;
 
 class Scene {
   public:
 	ObjectPool pool;
 	TileMap tilemap;
+	CollisionMap colmap;
 	Camera camera;
 	uint32_t width;
 	uint32_t height;
@@ -31,8 +39,8 @@ class Scene {
 	void instanceActiveRegion(const Rectangle&);
 
 	bool checkTile(const Rectangle& bbox, uint16_t flags) const;
-	bool checkSolid(const Rectangle& bbox, uint16_t except) const;
-	const GameEntity* checkObject(const Rectangle& bbox, uint16_t except, uint8_t flags = 0xFF) const;
+	bool checkCollision(const Rectangle& bbox, uint16_t flags) const;
+	const GameEntity* checkObject(const Rectangle& bbox, uint16_t except, uint8_t flags = 0) const;
 	void collisionHandle(const Rectangle& bbox, uint16_t except, EntityFn colfn);
 	void foreach(EntityFn, int group = -1);
 

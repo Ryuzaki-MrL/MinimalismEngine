@@ -38,8 +38,13 @@ bool Scene::checkTile(const Rectangle& bbox, uint16_t flags) const {
 	// TODO
 }
 
-bool Scene::checkSolid(const Rectangle& bbox, uint16_t except) const {
-	return (checkTile(bbox, TFLAG_SOLID)) || (checkObject(bbox, except, EFLAG_SOLID) != nullptr);
+bool Scene::checkCollision(const Rectangle& bbox, uint16_t flags) const {
+	for (const SceneCollision& col : colmap) {
+		if (BIT_TEST(col.flags, flags) && col.bbox.collideWith(bbox)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 const GameEntity* Scene::checkObject(const Rectangle& bbox, uint16_t except, uint8_t flags) const {
