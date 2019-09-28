@@ -30,10 +30,10 @@ void Game::setState(GameState* st) {
 	state = st;
 }
 
-void Game::setStateWithFade(GameState* st, uint16_t steps) {
+void Game::setStateWithFade(GameState* st, seconds_t time) {
 	transition = true;
 	tmpstate = st;
-	fadeStart(steps, C_BLACK);
+	fadeStart(time, C_BLACK);
 }
 
 void Game::draw() {

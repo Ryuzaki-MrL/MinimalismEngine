@@ -5,7 +5,7 @@
 
 enum { FADE_RUNNING, FADE_HALFDONE, FADE_DONE };
 
-void fadeStart(uint16_t steps, uint32_t color);
+void fadeStart(float time, uint32_t color);
 void fadeUpdate();
 int fadeStatus();
 

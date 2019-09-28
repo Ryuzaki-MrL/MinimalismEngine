@@ -3,31 +3,35 @@
 #include "types.h"
 
 struct FadeCtx {
+	Timer timer;
 	Color color;
-	uint16_t steps, counter;
+	float tend;
 	bool halfdone = false;
 	bool done = true;
 };
 
 static FadeCtx ctx;
 
-void fadeStart(uint16_t steps, uint32_t color) {
+void fadeStart(float time, uint32_t color) {
 	ctx.color.rgba = color;
-	ctx.steps = steps;
-	ctx.counter = 0;
+	ctx.timer.start(time);
+	ctx.tend = time;
 	ctx.done = ctx.halfdone = false;
 }
 
 void fadeUpdate() {
 	if (ctx.done) return;
 	if (ctx.halfdone) {
-		--ctx.counter;
-		if (ctx.counter == 0) ctx.done = true;
+		if (ctx.timer.complete()) {
+			ctx.done = true;
+		}
 	} else {
-		++ctx.counter;
-		if (ctx.counter >= ctx.steps) ctx.halfdone = true;
+		if (ctx.timer.complete()) {
+			ctx.halfdone = true;
+			ctx.timer.restart();
+		}
 	}
-	ctx.color.c.a = (ctx.counter * 255) / ctx.steps;
+	ctx.color.c.a = (ctx.timer.elapsed() * 255) / ctx.tend;
 	Renderer::targetBlend(ctx.color.rgba);
 }
 

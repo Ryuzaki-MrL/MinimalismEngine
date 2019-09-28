@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "Timer.h"
+
 #define UNITS_PER_FRAME(x, t) ((x) * (t))
 
 class GameState;
@@ -22,7 +24,7 @@ class Game {
 	inline float getFPS() const { return fps; }
 
 	void setState(GameState*);
-	void setStateWithFade(GameState*, uint16_t);
+	void setStateWithFade(GameState*, seconds_t);
 
 	void update();
 	void draw();

@@ -21,6 +21,7 @@ class Timer {
 	~Timer();
 
 	void start(seconds_t stop_after);
+	inline void restart() { start(tend); }
 	void pause();
 	void reset();
 	void stop();
