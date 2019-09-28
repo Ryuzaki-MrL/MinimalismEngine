@@ -5,6 +5,13 @@
 
 // TODO: separate SoundQueue and threaded implementation for each platform
 
+#ifndef AUDIO_SAMPLES
+#define AUDIO_SAMPLES	2048
+#endif
+#ifndef AUDIO_FREQUENCY
+#define AUDIO_FREQUENCY	22050
+#endif
+
 struct QueuedSound {
 	uint16_t id;
 	int channel;

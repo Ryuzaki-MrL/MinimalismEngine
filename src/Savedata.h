@@ -2,11 +2,16 @@
 #define SAVEDATA_H
 
 /* Game specific */
+#ifdef USE_SAVEDATA
 #include "SaveTypes.h"
+#endif
 #include "WorldData.h"
 
+#ifndef MAX_PROFILES
 #define MAX_PROFILES	1
+#endif
 
+#ifdef USE_SAVEDATA
 class SaveData {
   private:
 	/* Game specific */
@@ -28,7 +33,9 @@ SaveData& getGlobalSavedata();
 bool commitGlobalSavedata();
 
 const SaveProfile& getCurrentSaveProfile();
-void selectSaveProfile(uint16_t slot); // discards current WorldData
+#endif
+
+void selectSaveSlot(uint16_t slot); // discards current WorldData
 
 WorldData& getCurrentWorldData();
 bool commitCurrentWorldData();

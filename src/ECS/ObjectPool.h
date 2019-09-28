@@ -8,7 +8,7 @@
 #include "GameEntity.h"
 
 typedef std::function<bool(GameEntity&)> EntityActiveFn;
-typedef bool(*EntityFactory)(GameEntity* out, uint16_t id, Scene& scene); // plain function pointer
+typedef bool(*EntityFactory)(GameEntity*, uint16_t, Scene&); // plain function pointer
 
 class ObjectPool {
   private:

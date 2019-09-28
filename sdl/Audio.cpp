@@ -5,8 +5,6 @@
 
 #include "Audio.h"
 
-#define AUDIO_SAMPLES	2048
-
 namespace Audio {
 
 static std::unordered_map<uint16_t, Mix_Chunk*> s_chunks;
@@ -17,7 +15,7 @@ static std::queue<QueuedSound> s_sfxqueue;
 bool init() {
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
 	Mix_Init(MIX_INIT_OGG);
-	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, AUDIO_SAMPLES);
+	Mix_OpenAudio(AUDIO_FREQUENCY, MIX_DEFAULT_FORMAT, 2, AUDIO_SAMPLES);
 }
 
 void fini() {

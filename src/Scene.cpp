@@ -4,7 +4,9 @@
 #include "Scene.h"
 #include "Graphics.h"
 
+#ifndef OBJECT_CAPACITY
 #define OBJECT_CAPACITY 1000
+#endif
 
 Scene::Scene(): pool(OBJECT_CAPACITY), flags(0) {}
 Scene::~Scene() {}
@@ -81,7 +83,7 @@ void Scene::update() {
 }
 
 void Scene::draw() {
-	Renderer::targetClear(C_WHITE);
+	//Renderer::targetResize(camera.width, camera.height);
 	Renderer::targetTranslate(camera.getX(), camera.getY());
 
 	Renderer::drawTileMap(tilemap, camera.getViewport());

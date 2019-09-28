@@ -7,7 +7,9 @@
 #include "Geometry.h"
 #include "Sprite.h"
 
+#ifndef ENTITY_TIMERS
 #define ENTITY_TIMERS	1
+#endif
 
 #define EFLAG_DEAD		0b00000001
 #define EFLAG_VISIBLE	0b00000010

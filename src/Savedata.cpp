@@ -3,15 +3,22 @@
 
 #include "Savedata.h"
 
+#ifndef SAVEDATA_PATH
 #define SAVEDATA_PATH   "savedata.bin"
+#endif
+#ifndef PROFILE_PATH
 #define PROFILE_PATH	"profiles.bin"
+#endif
 
+#ifdef USE_SAVEDATA
 static SaveData g_save(PROFILE_PATH);
+#endif
 static WorldData g_wdata[MAX_PROFILES];
 static WorldData g_current_wdata;
 static bool g_saveinit = false;
 static uint16_t g_slot = 0;
 
+#ifdef USE_SAVEDATA
 SaveData::SaveData(const char* filename): profiles(), sys() {
 	FILE* file = fopen(filename, "rb");
 	if (!file) return;
@@ -58,8 +65,9 @@ bool commitGlobalSavedata() {
 const SaveProfile& getCurrentSaveProfile() {
 	return g_save.getProfile(g_slot);
 }
+#endif
 
-void selectSaveProfile(uint16_t slot) {
+void selectSaveSlot(uint16_t slot) {
 	if (!g_saveinit) {
 		loadGlobalWorldData(SAVEDATA_PATH);
 		g_saveinit = true;
