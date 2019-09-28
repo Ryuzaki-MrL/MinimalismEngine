@@ -6,14 +6,14 @@
 
 namespace Input {
 
-static uint64_t kDown;
-static uint64_t kHeld;
-static uint64_t kUp;
+static key_t kDown;
+static key_t kHeld;
+static key_t kUp;
 static touchPosition touch;
 static JoystickPosition joypad[2];
 static SixAxisSensorValues sas;
 
-static uint64_t kBinds[MAX_KEYBINDS];
+static key_t kBinds[MAX_KEYBINDS];
 
 bool init() {
 	hidInitialize();
@@ -38,7 +38,7 @@ void poll() {
 	hidSixAxisSensorValuesRead(&sas, CONTROLLER_P1_AUTO, 1);
 }
 
-bool isKeyDown(uint64_t key) {
+bool isKeyDown(key_t key) {
 	return (kDown & key);
 }
 
@@ -46,7 +46,7 @@ bool isKeyBindDown(uint16_t index) {
 	return (kDown & kBinds[index]);
 }
 
-bool isKeyHeld(uint64_t key) {
+bool isKeyHeld(key_t key) {
 	return (kHeld & key);
 }
 
@@ -54,7 +54,7 @@ bool isKeyBindHeld(uint16_t index) {
 	return (kHeld & kBinds[index]);
 }
 
-bool isKeyUp(uint64_t key) {
+bool isKeyUp(key_t key) {
 	return (kUp & key);
 }
 
@@ -62,7 +62,7 @@ bool isKeyBindUp(uint16_t index) {
 	return (kUp & kBinds[index]);
 }
 
-void keyBind(uint16_t index, uint64_t key) {
+void keyBind(uint16_t index, key_t key) {
 	kBinds[index] = key;
 }
 
@@ -78,23 +78,23 @@ uint16_t getTouchY() {
 	return touch.py;
 }
 
-int16_t getStickAxisX(uint8_t stick) {
+axis_t getStickAxisX(uint8_t stick) {
 	return cpad[stick].dx;
 }
 
-int16_t getCirclePadY(uint8_t stick) {
+axis_t getStickAxisY(uint8_t stick) {
 	return cpad[stick].dy;
 }
 
-int16_t getAccelX() {
+axis_t getAccelX() {
 	return sas.accelerometer.x;
 }
 
-int16_t getAccelY() {
+axis_t getAccelY() {
 	return sas.accelerometer.y;
 }
 
-int16_t getAccelZ() {
+axis_t getAccelZ() {
 	return sas.accelerometer.z;
 }
 
@@ -106,15 +106,15 @@ void setAccelState(bool state) {
 	}
 }
 
-int16_t getGyroX() {
+axis_t getGyroX() {
 	return sas.gyroscope.x;
 }
 
-int16_t getGyroY() {
+axis_t getGyroY() {
 	return sas.gyroscope.y;
 }
 
-int16_t getGyroZ() {
+axis_t getGyroZ() {
 	return sas.gyroscope.z;
 }
 
@@ -126,7 +126,7 @@ void setGyroState(bool state) {
 	}
 }
 
-bool getString(char* out, const char* htext, const char* def, int maxlength, bool password) {
+bool getString(char* out, const char* htext, const char* def, size_t maxlength, bool password) {
 	SwkbdConfig* kb;
 
 	Result res = swkbdCreate(kb, 0);

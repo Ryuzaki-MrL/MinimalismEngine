@@ -6,15 +6,15 @@
 
 namespace Input {
 
-static uint32_t kDown;
-static uint32_t kHeld;
-static uint32_t kUp;
+static key_t kDown;
+static key_t kHeld;
+static key_t kUp;
 static touchPosition touch;
 static circlePosition cpad[2];
 static accelVector accel;
 static angularRate gyro;
 
-static uint32_t kBinds[MAX_KEYBINDS];
+static key_t kBinds[MAX_KEYBINDS];
 
 bool init() {
 	hidInit();
@@ -38,7 +38,7 @@ void poll() {
 	hidGyroRead(&gyro);
 }
 
-bool isKeyDown(uint32_t key) {
+bool isKeyDown(key_t key) {
 	return (kDown & key);
 }
 
@@ -46,7 +46,7 @@ bool isKeyBindDown(uint16_t index) {
 	return (kDown & kBinds[index]);
 }
 
-bool isKeyHeld(uint32_t key) {
+bool isKeyHeld(key_t key) {
 	return (kHeld & key);
 }
 
@@ -54,7 +54,7 @@ bool isKeyBindHeld(uint16_t index) {
 	return (kHeld & kBinds[index]);
 }
 
-bool isKeyUp(uint32_t key) {
+bool isKeyUp(key_t key) {
 	return (kUp & key);
 }
 
@@ -62,7 +62,7 @@ bool isKeyBindUp(uint16_t index) {
 	return (kUp & kBinds[index]);
 }
 
-void keyBind(uint16_t index, uint32_t key) {
+void keyBind(uint16_t index, key_t key) {
 	kBinds[index] = key;
 }
 
@@ -78,23 +78,23 @@ uint16_t getTouchY() {
 	return touch.py;
 }
 
-int16_t getStickAxisX(uint8_t stick) {
+axis_t getStickAxisX(uint8_t stick) {
 	return cpad[stick].dx;
 }
 
-int16_t getCirclePadY(uint8_t stick) {
+axis_t getStickAxisY(uint8_t stick) {
 	return cpad[stick].dy;
 }
 
-int16_t getAccelX() {
+axis_t getAccelX() {
 	return accel.x;
 }
 
-int16_t getAccelY() {
+axis_t getAccelY() {
 	return accel.y;
 }
 
-int16_t getAccelZ() {
+axis_t getAccelZ() {
 	return accel.z;
 }
 
@@ -106,15 +106,15 @@ void setAccelState(bool state) {
 	}
 }
 
-int16_t getGyroX() {
+axis_t getGyroX() {
 	return gyro.x;
 }
 
-int16_t getGyroY() {
+axis_t getGyroY() {
 	return gyro.y;
 }
 
-int16_t getGyroZ() {
+axis_t getGyroZ() {
 	return gyro.z;
 }
 
@@ -126,7 +126,7 @@ void setGyroState(bool state) {
 	}
 }
 
-bool getString(char* out, const char* htext, const char* def, int maxlength, bool password) {
+bool getString(char* out, const char* htext, const char* def, size_t maxlength, bool password) {
 	SwkbdState kb;
 
 	swkbdInit(&kb, SWKBD_TYPE_QWERTY, 2, maxlength);
