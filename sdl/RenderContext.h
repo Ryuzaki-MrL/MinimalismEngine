@@ -11,6 +11,8 @@
 #define SUBSCREEN_WIDTH 1280
 #define SUBSCREEN_HEIGHT 720
 
+#define DEFAULT_SCREEN nullptr
+
 typedef SDL_Window* Screen;
 
 struct RenderContext {

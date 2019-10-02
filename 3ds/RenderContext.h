@@ -12,6 +12,8 @@
 #define SUBSCREEN_WIDTH 320
 #define SUBSCREEN_HEIGHT 240
 
+#define DEFAULT_SCREEN {GFX_TOP, GFX_LEFT}
+
 typedef C3D_RenderTarget RenderTarget;
 
 struct Screen {
