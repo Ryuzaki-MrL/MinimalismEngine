@@ -5,6 +5,8 @@
 #define BIT_TEST(x, b) 	(((x) & (b)) == (b))
 #define BIT_CLEAR(x, b) ((x) &= ~(b))
 
+extern float g_deltatime;
+
 union Color {
 	uint32_t rgba;
 	struct c {

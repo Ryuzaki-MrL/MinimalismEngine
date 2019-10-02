@@ -4,22 +4,25 @@
 #include "System.h"
 #include "Graphics.h"
 
+float g_deltatime;
+
 Game::Game(): framecnt(0), state(nullptr), running(true), transition(false) {
-	frametimer.start(1.0);
+	frametimer.start();
 }
 
 Game::~Game() {
 	delete state;
 }
 
-// TODO: apply delta time on update
-void Game::update() {
+// The game decides if timestep is fixed or variable
+void Game::update(seconds_t delta) {
 	if (transition) {
 		switch(fadeStatus()) {
 			case FADE_HALFDONE: setState(tmpstate); break;
 			case FADE_DONE: transition = false; break;
 		}
 	} else {
+		g_deltatime = delta;
 		Input::update();
 		state->update();
 	}

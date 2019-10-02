@@ -26,7 +26,7 @@ class Game {
 	void setState(GameState*);
 	void setStateWithFade(GameState*, seconds_t);
 
-	void update();
+	void update(seconds_t);
 	void draw();
 	void end();
 };
