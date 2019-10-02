@@ -1,16 +1,13 @@
-TODO: load resources from a filename list for each platform
-
 Animations:
 Load alongside spritedata (same RZDB)
 Contains: list of sprite ids
 
 
 TODO:
-- make Renderer a private namespace
+- Window class
+- window management (windowCreate and windowDestroy with IDs)
 - separate screen size from SDL code
-- platform-specific coordinate typedef (float, int, etc)
-  - to avoid typecast when rendering
-- better resource management
+- use RAII to automatically destroy assets (sprites, entities, messages)
 - extendable classes (tilemap, geometry, etc)
 - network features (friends, achievements, etc)
   - Network::init flags (NETWORK_FEAT_*; FRIENDS, TROPHIES, etc)
@@ -20,6 +17,7 @@ TODO:
 
 Minimalism Editor:
 Create or load a project folder containing
+ -main project file (can be passed as parameter arg0)
  -game settings
   -title
   -target platforms (checkboxes)
@@ -29,12 +27,16 @@ Create or load a project folder containing
   -text database and metadata (same file)
   -entity database and metadata (separate files)
   -sprite database and metadata (separate files)
-  -SDL spritesheet editor
 
 Editors:
 Text, sprite data, entity data
 Custom game editors (plugins)
 Entity code editor (generates the .h and .cpp files)
+
+Sprite editor:
+- Add sprites to combobox
+- Load a preview image (files are copied to meta/sprites)
+- Configure bbox
 
 Data files are stored at the project's root, but if a file of same
 name is found within a target platform's folder, it will be used
