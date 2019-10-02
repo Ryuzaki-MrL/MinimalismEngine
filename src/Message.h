@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string>
 
-void messageInit(const char* filename);
+void messagesLoad(const char* filename);
 
 void messageSetLang(uint16_t id);
 void messageSetLang(const std::string& id);

@@ -28,7 +28,7 @@ namespace Audio {
 
 	void processQueue();
 
-	void playMusic(uint16_t id, int loops);
+	void playMusic(uint16_t id, int loops = -1);
 	void pauseMusic();
 	void resumeMusic();
 	void stopMusic();

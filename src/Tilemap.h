@@ -10,6 +10,7 @@ struct Tile {
 	float x, y;
 	float xscale;
 	float yscale;
+	uint16_t sheet;
 	uint16_t texture;
 	uint16_t flags;
 };

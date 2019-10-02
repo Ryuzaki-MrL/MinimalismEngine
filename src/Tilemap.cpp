@@ -6,7 +6,7 @@
 Tilemap::Tilemap(): sections(nullptr) {}
 
 Tilemap::~Tilemap() {
-	Renderer::destroyTarget(cached);
+	Renderer::destroyTargetTexture(cached);
 	if (sections) delete sections;
 }
 
@@ -46,7 +46,7 @@ const TileMapRegion& Tilemap::getRegion(const Rectangle& region) const {
 
 void Tilemap::cacheToTexture(uint16_t id) {
 	cached = id;
-	Renderer::createTarget(id, sec_width * sec_cols, sec_height * sec_rows);
+	Renderer::createTargetTexture(id, sec_width * sec_cols, sec_height * sec_rows);
 	Renderer::targetTexture(id);
 
 	for (int i = 0; i < sec_rows*sec_cols; ++i) {

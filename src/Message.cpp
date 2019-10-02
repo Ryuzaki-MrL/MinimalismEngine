@@ -12,16 +12,16 @@ static RZDB_Chunk* messages;
 static MsgDict langmap;
 static MsgDict* msgmap;
 
-void messageInit(const char* filename) {
+void messagesLoad(const char* filename) {
 	RZDB_File* rf = RZDB_OpenFile(filename);
-	
+
 	uint16_t langcnt = RZDB_ReadSize(rf);
 	langs = RZDB_ReadChunkIndexed(rf, sizeof(char), langcnt);
-	
+
 	uint16_t entrycnt = RZDB_ReadSize(rf);
 	msgentries = RZDB_ReadChunkIndexed(rf, sizeof(char), entrycnt);
 	messages = RZDB_ReadChunkIndexed(rf, sizeof(char), entrycnt * langcnt);
-	
+
 	msgmap = new MsgDict[langcnt];
 	for (uint16_t i = 0; i < langcnt; ++i) {
 		langmap[std::string(RZDB_ChunkGetDataAt(langs, i))] = i;
@@ -29,7 +29,7 @@ void messageInit(const char* filename) {
 			msgmap[i][std::string(RZDB_ChunkGetDataAt(msgentries, j))] = i*entrycnt + j;
 		}
 	}
-	
+
 	RZDB_CloseFile(rf);
 }
 

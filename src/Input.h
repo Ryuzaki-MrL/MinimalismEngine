@@ -10,7 +10,6 @@
 #endif
 
 // TODO: mouse, keyboard, multiple controllers and touch points
-// TODO: key, touch and axis int types per platform (int16, uint32, etc)
 // TODO: bind multiple keys to the same slot
 
 namespace Input {

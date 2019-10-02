@@ -47,17 +47,21 @@ struct Rectangle {
 		return !((other.left > right) || (other.right < left) || (other.top > bot) || (other.bot < top));
 	}
 
+	inline bool isInside(float x, float y) const {
+		return (x > left && x < right && y > top && y < bot);
+	}
+
 	inline bool isInside(const Rectangle& other) const {
 		return (other.left >= left) && (other.right <= right) && (other.top >= top) && (other.bot <= bot);
 	}
 
 	inline const Rectangle operator+(const Rectangle other) const {
 		return Rectangle((other.left + left), (other.right + right), (other.top + top), (other.bot + bot));
-	};
-	
+	}
+
 	inline const Rectangle operator*(const Rectangle other) const {
 		return Rectangle((other.left * left), (other.right * right), (other.top * top), (other.bot * bot));
-	};
+	}
 };
 
 

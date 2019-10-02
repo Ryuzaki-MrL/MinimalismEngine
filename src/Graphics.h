@@ -22,8 +22,8 @@ namespace Renderer {
 	void frameStart();
 	void frameEnd();
 
-	void createTarget(uint16_t id, uint32_t w, uint32_t h);
-	void destroyTarget(uint16_t id);
+	void createTargetTexture(uint16_t id, uint32_t w, uint32_t h);
+	void destroyTargetTexture(uint16_t id);
 
 	void targetTexture(uint16_t targ);
 	void targetScreen(Screen);

@@ -62,12 +62,12 @@ void frameEnd() {
 	SDL_RenderPresent(ctx.renderer);
 }
 
-void createTarget(uint16_t id, uint32_t w, uint32_t h) {
-	destroyTarget(id);
+void createTargetTexture(uint16_t id, uint32_t w, uint32_t h) {
+	destroyTargetTexture(id);
 	s_txcache[id] = SDL_CreateTexture(ctx.renderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_TARGET, w, h);
 }
 
-void destroyTarget(uint16_t id) {
+void destroyTargetTexture(uint16_t id) {
 	if (s_txcache.count(id) && s_txcache[id] != nullptr) {
 		SDL_DestroyTexture(s_txcache[id]);
 	}
@@ -166,11 +166,12 @@ void drawTileMap(const TileMap& tmap, const Rectangle& region, float depth) {
 }
 
 void drawTile(const Tile& tile, float depth) {
-	SDL_Texture* tex = s_sheets[tile.texture].getTextureSheet();
+	const SDL_Rect* src = s_sheets[tile.sheet].getTexturePart(tile.texture);
+	SDL_Texture* tex = s_sheets[tile.sheet].getTextureSheet();
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
 	if (tile.xscale < 0) flip |= SDL_FLIP_HORIZONTAL;
 	if (tile.yscale < 0) flip |= SDL_FLIP_VERTICAL;
-	s_srcrect = { tile.dim.left, tile.dim.top, tile.dim.right, tile.dim.bot };
+	s_srcrect = { src.x + tile.dim.left, src.y + tile.dim.top, tile.dim.right, tile.dim.bot };
 	s_dstrect = { tile.x - tx, tile.y - ty, abs(s_srcrect.w * tile.xscale), abs(s_srcrect.h * tile.yscale) };
 	s_points[0] = { 0, 0 };
 	SDL_RenderCopyEx(ctx.renderer, tex, &s_srcrect, &s_dstrect, 0.f, &s_points[0], flip);

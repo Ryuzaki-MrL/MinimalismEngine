@@ -60,11 +60,11 @@ void frameEnd() {
 	C3D_FrameEnd(0);
 }
 
-void createTarget(uint16_t id, uint32_t w, uint32_t h) {
+void createTargetTexture(uint16_t id, uint32_t w, uint32_t h) {
 	// TODO
 }
 
-void destroyTarget(uint16_t id) {
+void destroyTargetTexture(uint16_t id) {
 	// TODO
 }
 
@@ -76,12 +76,12 @@ void targetScreen(Screen screen) {
 	if (screen.type == GFX_TOP) {
 		C2D_SceneBegin(ctx.currtarg = ((screen.side==GFX_LEFT) ? ctx.top : ctx.right));
 		s_3dside = (screen.side==GFX_LEFT) ? -1.0 : 1.0;
-		ctx.tw = SCREEN_WIDTH;
+		ctx.tw = 400;
 	} else {
 		C2D_SceneBegin(ctx.currtarg = ctx.bot);
-		ctx.tw = SUBSCREEN_WIDTH;
+		ctx.tw = 320;
 	}
-	ctx.th = SCREEN_HEIGHT;
+	ctx.th = 240;
 	C2D_TargetClear(ctx.currtarg, C_WHITE);
 }
 
