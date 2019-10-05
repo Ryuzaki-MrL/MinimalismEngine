@@ -11,21 +11,25 @@
 #endif
 
 #ifdef USE_SAVEDATA
-static SaveData g_save(PROFILE_PATH);
+static SaveData g_save;
 #endif
+
 static WorldData g_wdata[MAX_PROFILES];
 static WorldData g_current_wdata;
 static bool g_saveinit = false;
 static uint16_t g_slot = 0;
 
 #ifdef USE_SAVEDATA
-SaveData::SaveData(const char* filename): profiles(), sys() {
+SaveData::SaveData(): profiles(), sys() {}
+SaveData::~SaveData() {}
+
+bool SaveData::load(const char* filename) {
 	FILE* file = fopen(filename, "rb");
-	if (!file) return;
+	if (!file) return false;
 	fread(this, 1, sizeof(SaveData), file);
 	fclose(file);
+	return true;
 }
-SaveData::~SaveData() {}
 
 bool SaveData::commit(const char* filename) const {
 	FILE* file = fopen(filename, "wb");
@@ -38,6 +42,23 @@ bool SaveData::commit(const char* filename) const {
 void SaveData::clear() {
 	memset(this, 0, sizeof(SaveData));
 }
+
+bool initGlobalSavedata() {
+	return g_save.load(PROFILE_PATH);
+}
+
+bool commitGlobalSavedata() {
+	return g_save.commit(PROFILE_PATH);
+}
+
+SaveData& getGlobalSavedata() {
+	return g_save;
+}
+
+const SaveProfile& getCurrentSaveProfile() {
+	return g_save.getProfile(g_slot);
+}
+#endif
 
 static void loadGlobalWorldData(const char* filename) {
 	FILE* file = fopen(filename, "rb");
@@ -53,19 +74,6 @@ static bool saveGlobalWorldData(const char* filename) {
 	fclose(file);
 	return true;
 }
-
-SaveData& getGlobalSavedata() {
-	return g_save;
-}
-
-bool commitGlobalSavedata() {
-	return g_save.commit(PROFILE_PATH);
-}
-
-const SaveProfile& getCurrentSaveProfile() {
-	return g_save.getProfile(g_slot);
-}
-#endif
 
 void selectSaveSlot(uint16_t slot) {
 	if (!g_saveinit) {

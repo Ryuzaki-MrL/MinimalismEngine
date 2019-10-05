@@ -5,6 +5,7 @@
 #ifdef USE_SAVEDATA
 #include "SaveTypes.h"
 #endif
+
 #include "WorldData.h"
 
 #ifndef MAX_PROFILES
@@ -19,18 +20,20 @@ class SaveData {
 	SaveSystem sys;
 
   public:
-	SaveData(const char* filename);
+	SaveData();
 	~SaveData();
 
 	inline SaveProfile& getProfile(uint16_t p) { return profiles[p]; }
 	inline SaveSystem& getSystemData() { return sys; }
 
-	bool commit(const char* filename) const;
+	bool load(const char*);
+	bool commit(const char*) const;
 	void clear();
 };
 
-SaveData& getGlobalSavedata();
+bool initGlobalSavedata();
 bool commitGlobalSavedata();
+SaveData& getGlobalSavedata();
 
 const SaveProfile& getCurrentSaveProfile();
 #endif
