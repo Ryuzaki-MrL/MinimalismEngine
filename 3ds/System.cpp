@@ -24,12 +24,20 @@ void fini() {
 	romfsExit();
 }
 
+bool loop() {
+	return aptMainLoop();
+}
+
 uint64_t getTime() {
 	return osGetTime();
 }
 
 uint16_t getLanguage() {
 	return lang;
+}
+
+const char* getRootPath() {
+	return "romfs:/";
 }
 
 }; // namespace System

@@ -9,8 +9,12 @@ namespace System {
 	bool init();
 	void fini();
 
-	uint64_t getTime();
+	bool loop(); // process events, etc
+
+	uint64_t getTime(); // TODO: datetime
 	uint16_t getLanguage();
+
+	const char* getRootPath();
 };
 
 #endif /* SYSTEM_H */

@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "GameState.h"
 #include "Input.h"
 #include "Fading.h"
 #include "System.h"

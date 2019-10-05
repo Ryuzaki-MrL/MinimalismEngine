@@ -100,6 +100,7 @@ static void RZFT_WordWrap(const RZFT_Font* font, float scale, int wrap, char* te
 
 static void RZFT_DrawTextInternal(const RZFT_Font* font, float x, float y, float scaleX, float scaleY, u32 color, int align, const char* text) {
 	static C2D_ImageTint tint;
+	// TODO: center text line by line (calculate individual width for each line)
 	float xx = x - (RZFT_GetTextWidth(font, scaleX, text) * (align / 2.0));
 	float yy = y;
 	C2D_PlainImageTint(&tint, color, 1.0f);

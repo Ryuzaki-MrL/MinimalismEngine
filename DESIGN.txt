@@ -6,6 +6,8 @@ Contains: list of sprite ids
 TODO:
 - Window class
 - window management (windowCreate and windowDestroy with IDs)
+- Sprite::makeBoundingBox for calculating bbox
+- GameEntity methods for rotation and scaling with flags (SCALE_BBOX, SCALE_SPRITE, SCALE_ALL)
 - separate screen size from SDL code
 - use RAII to automatically destroy assets (sprites, entities, messages)
 - extendable classes (tilemap, geometry, etc)
