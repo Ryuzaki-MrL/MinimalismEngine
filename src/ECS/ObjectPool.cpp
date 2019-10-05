@@ -25,9 +25,11 @@ void ObjectPool::destroy(size_t pos) {
 	std::swap(obj[pos], obj[--count]);
 }
 
+// TODO: find a way to decrease object count here
 void ObjectPool::garbageCollect() {
 	for (size_t i = 0; i < activelist.size();) {
 		if (obj[activelist[i]].get()->isDead()) {
+			obj[activelist[i]].get()->~GameEntity();
 			std::swap(activelist[i], activelist.back());
 			activelist.pop_back();
 		} else {
@@ -46,7 +48,8 @@ void ObjectPool::buildActiveList(EntityActiveFn isActive) {
 	for (size_t i = 0; i < count;) {
 		GameEntity& inst = *obj[i];
 		if (inst.isDead()) {
-			destroy(i);
+			std::swap(obj[i], obj[--count]);
+			//destroy(i);
 		} else {
 			if (isActive(inst)) {
 				inst.onLoad();
