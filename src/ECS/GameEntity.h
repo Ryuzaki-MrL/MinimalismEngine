@@ -19,11 +19,12 @@ class Scene;
 class GameEntity {
   public:
 	Components comps;
-  protected:
-	Timer timers[ENTITY_TIMERS];
+	DeltaTimer timers[ENTITY_TIMERS];
 	Sprite spr;
 	Rectangle bbox;
 	Vector2D v;
+  protected:
+	DeltaTimer animtimer;
 	float x, y, xs, ys;
 	Scene& scene;
 	const EntityData& data;
@@ -41,6 +42,7 @@ class GameEntity {
 	virtual void onMove() {}
 	virtual void onInteract(GameEntity& /* other */) {}
 	virtual void onTimeOut(uint8_t /* timer */) {}
+	virtual void onAnimEnd() {}
 
   public:
 	GameEntity(Scene& scene, uint16_t type);
@@ -77,9 +79,6 @@ class GameEntity {
 
 	inline bool collideWith(const Rectangle& r) const { return r.collideWith(getBoundingBox()); }
 	inline bool collideWith(const GameEntity& obj) const { return obj.collideWith(getBoundingBox()); }
-
-	void pauseTimers();
-	void resetTimers();
 
 	void update();
 	void draw();

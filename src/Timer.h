@@ -34,4 +34,33 @@ class Timer {
 	ticks_t elapsedTicks();
 };
 
+
+class DeltaTimer {
+  public:
+	seconds_t tend;
+  private:
+	seconds_t tcurrent;
+	bool running;
+
+  public:
+	DeltaTimer(): tcurrent(0), tend(0), running(false) {}
+	~DeltaTimer() {}
+
+	inline void start(seconds_t stop = 0) {
+		tcurrent = 0;
+		tend = stop;
+		running = true;
+	}
+
+	inline bool update(seconds_t dt) {
+		if (running) tcurrent += dt;
+		return running;
+	}
+
+	inline void stop() { running = false; }
+
+	inline seconds_t elapsed() const { return tcurrent; }
+	inline bool complete() const { return (running && tcurrent >= tend); }
+};
+
 #endif /* TIMER_H */

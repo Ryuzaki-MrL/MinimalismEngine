@@ -12,10 +12,9 @@ struct Sprite {
 	float xscale;
 	float yscale;
 	float rotation;
+	float speed; // spf
 	uint16_t id;
 	uint16_t frame;
-	int8_t steps;
-	uint8_t counter;
 };
 
 struct SpriteData {
@@ -30,6 +29,7 @@ struct SpriteData {
 	uint16_t sheet;
 	uint16_t texture;
 	uint16_t imgcount;
+	uint16_t padding;
 };
 
 void spritesLoad(const char* filename);
