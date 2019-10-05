@@ -48,13 +48,13 @@ size_t RZDB_ReadString(RZDB_File* file, char* out) {
 
 size_t RZDB_ReadSize(RZDB_File* file) {
 	size_t sz = 0;
+	size_t shift = 0;
 	u8 tmp = 0;
 	do {
 		fread(&tmp, 1, sizeof(tmp), file->handle);
-		sz <<= 7;
-		sz += tmp & 0x7F;
-	}
-	while(tmp > 127);
+		sz |= (tmp & 0x7F) << shift;
+		shift += 7;
+	} while(tmp > 127);
 	return sz;
 }
 
