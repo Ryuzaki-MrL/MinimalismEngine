@@ -9,7 +9,7 @@ static uint8_t lang;
 
 bool init() {
 	// TODO: init other services if requested
-	romfsInit();
+	Result res = romfsInit();
 
 	APT_CheckNew3DS(&isNew3DS);
 	if (isNew3DS)
@@ -18,6 +18,8 @@ bool init() {
 	cfguInit();
 	CFGU_GetSystemLanguage(&lang);
 	cfguExit();
+
+	return R_SUCCEEDED(res);
 }
 
 void fini() {
@@ -34,6 +36,14 @@ uint64_t getTime() {
 
 uint16_t getLanguage() {
 	return lang;
+}
+
+uint64_t getTicks() {
+	return svcGetSystemTick();
+}
+
+uint64_t getFrequency() {
+	return SYSCLOCK_ARM11;
 }
 
 const char* getRootPath() {

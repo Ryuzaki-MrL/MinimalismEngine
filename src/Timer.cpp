@@ -1,14 +1,13 @@
-#include <3ds.h>
-
 #include "Timer.h"
+#include "System.h"
 
-#define ELAPSED (seconds_t(svcGetSystemTick() - tstart) / SYSCLOCK_ARM11)
+#define ELAPSED (seconds_t(System::getTicks() - tstart) / System::getFrequency())
 
-Timer::Timer(): tstart(0), tend(0), state(TIMER_STOPPED) {}
+Timer::Timer(): tend(0), tstart(0), state(TIMER_STOPPED) {}
 Timer::~Timer() {}
 
 void Timer::start(seconds_t stop_after) {
-	tstart = svcGetSystemTick();
+	tstart = System::getTicks();
 	tend = stop_after;
 	state = TIMER_RUNNING;
 }
@@ -22,7 +21,7 @@ void Timer::pause() {
 
 void Timer::reset() {
 	if (state != TIMER_STOPPED) {
-		tstart = svcGetSystemTick();
+		tstart = System::getTicks();
 		state = TIMER_RUNNING;
 	}
 }
@@ -49,5 +48,5 @@ seconds_t Timer::elapsed() {
 }
 
 ticks_t Timer::elapsedTicks() {
-	return (svcGetSystemTick() - tstart);
+	return (System::getTicks() - tstart);
 }

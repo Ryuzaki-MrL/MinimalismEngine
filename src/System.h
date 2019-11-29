@@ -14,6 +14,9 @@ namespace System {
 	uint64_t getTime(); // TODO: datetime
 	uint16_t getLanguage();
 
+	uint64_t getTicks();
+	uint64_t getFrequency(); // Hz
+
 	const char* getRootPath();
 };
 

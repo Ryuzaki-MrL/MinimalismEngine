@@ -7,6 +7,9 @@
 #define TIMER_RUNNING	1
 #define TIMER_PAUSED	2
 
+#define ONE_SECOND 1.0
+#define HALF_SECOND 0.5
+
 typedef float seconds_t;
 typedef uint64_t ticks_t;
 
@@ -43,7 +46,7 @@ class DeltaTimer {
 	bool running;
 
   public:
-	DeltaTimer(): tcurrent(0), tend(0), running(false) {}
+	DeltaTimer(): tend(0), tcurrent(0), running(false) {}
 	~DeltaTimer() {}
 
 	inline void start(seconds_t stop = 0) {
@@ -57,10 +60,12 @@ class DeltaTimer {
 		return running;
 	}
 
+	inline void restart() { start(tend); }
 	inline void stop() { running = false; }
 
 	inline seconds_t elapsed() const { return tcurrent; }
 	inline bool complete() const { return (running && tcurrent >= tend); }
+	inline bool isRunning() const { return running; }
 };
 
 #endif /* TIMER_H */
