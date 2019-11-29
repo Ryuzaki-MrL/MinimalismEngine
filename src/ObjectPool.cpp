@@ -6,9 +6,7 @@ ObjectPool::ObjectPool(size_t n): obj(new ClassBuffer<GameEntity>[n]), factory(n
 	activelist.reserve(n);
 }
 ObjectPool::~ObjectPool() {
-	for (size_t i = 0; i < count; ++i) {
-		obj[i].get()->~GameEntity();
-	}
+	clear();
 	delete obj;
 }
 
@@ -16,6 +14,10 @@ GameEntity* ObjectPool::create(uint16_t id, Scene& scene) {
 	if (count < size && factory && factory(obj[count], id, scene)) {
 		activelist.push_back(count);
 		return obj[count++];
+	}
+	if (count == size && factory && !deadqueue.empty()) {
+		size_t idx = deadqueue.front(); deadqueue.pop_front();
+		if (factory(obj[idx], id, scene)) return obj[idx];
 	}
 	return nullptr;
 }
@@ -25,11 +27,12 @@ void ObjectPool::destroy(size_t pos) {
 	std::swap(obj[pos], obj[--count]);
 }
 
-// TODO: find a way to decrease object count here
 void ObjectPool::garbageCollect() {
 	for (size_t i = 0; i < activelist.size();) {
-		if (obj[activelist[i]].get()->isDead()) {
-			obj[activelist[i]].get()->~GameEntity();
+		size_t idx = activelist[i];
+		if (obj[idx].get()->isDead()) {
+			obj[idx].get()->~GameEntity();
+			deadqueue.push_back(idx);
 			std::swap(activelist[i], activelist.back());
 			activelist.pop_back();
 		} else {
@@ -39,8 +42,19 @@ void ObjectPool::garbageCollect() {
 }
 
 void ObjectPool::clear() {
-	count = 0;
 	clearActiveList();
+	for (size_t i = 0; i < count; ++i) {
+		if (!obj[i].get()->isDead()) {
+			obj[i].get()->~GameEntity();
+		}
+	}
+	count = 0;
+}
+
+void ObjectPool::clearActiveList() {
+	garbageCollect();
+	activelist.clear();
+	deadqueue.clear();
 }
 
 void ObjectPool::buildActiveList(EntityActiveFn isActive) {

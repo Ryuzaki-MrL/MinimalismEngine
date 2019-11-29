@@ -2,6 +2,7 @@
 #define OBJECTPOOL_H
 
 #include <vector>
+#include <deque>
 #include <functional>
 
 #include "ClassBuffer.h"
@@ -14,6 +15,7 @@ class ObjectPool {
   private:
 	ClassBuffer<GameEntity>* obj;
 	std::vector<size_t> activelist;
+	std::deque<size_t> deadqueue; // pun not intended
 	EntityFactory factory;
 	size_t size, count;
 
@@ -35,7 +37,7 @@ class ObjectPool {
 	void clear();
 
 	void buildActiveList(EntityActiveFn);
-	inline void clearActiveList() { activelist.clear(); }
+	void clearActiveList();
 	inline const std::vector<size_t>& getActiveList() const { return activelist; }
 };
 

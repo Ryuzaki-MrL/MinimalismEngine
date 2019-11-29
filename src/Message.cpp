@@ -5,15 +5,16 @@
 
 typedef std::unordered_map<std::string, uint16_t> MsgDict;
 
-static uint16_t g_lang;
+static uint16_t g_lang = 0;
 static RZDB_Chunk* langs;
 static RZDB_Chunk* msgentries;
 static RZDB_Chunk* messages;
 static MsgDict langmap;
 static MsgDict* msgmap;
 
-void messagesLoad(const char* filename) {
+bool messagesLoad(const char* filename) {
 	RZDB_File* rf = RZDB_OpenFile(filename);
+	if (!rf) return false;
 
 	uint16_t langcnt = RZDB_ReadSize(rf);
 	langs = RZDB_ReadChunkIndexed(rf, sizeof(char), langcnt);
@@ -31,6 +32,7 @@ void messagesLoad(const char* filename) {
 	}
 
 	RZDB_CloseFile(rf);
+	return true;
 }
 
 void messageSetLang(uint16_t id) {
@@ -59,5 +61,5 @@ const char* messageGet(const std::string& id) {
 }
 
 uint16_t messageGetIndex(const std::string& id) {
-	return msgmap[g_lang][id];
+	return msgmap[0][id];
 }
