@@ -16,13 +16,14 @@ ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
 DEFINES	:=	$(ENGINE_DEFINES) $(GAME_DEFINES)
 
+ENGINEDIR := $(GAMEDIR)/MinimalismEngine
 ENGINESRC := src src/util 3ds
 
 CFLAGS	:=	-g -Wall -Wextra -Wno-psabi -O2 -mword-relocations \
 			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
-CFLAGS	+=	$(INCLUDE) -DARM11 -D__3DS__
+CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
@@ -47,20 +48,25 @@ ifneq ($(BUILD),$(notdir $(GAMEDIR)))
 export OUTPUT	:=	$(OUTDIR)/$(TARGET)
 export TOPDIR	:=	$(GAMEDIR)
 
-export GFXBUILD	:=	$(ROMFS)
+export GFXBUILD	:=	$(GAMEDIR)/$(GFXOUT)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(GAMEDIR)/$(dir)) \
 			$(foreach dir,$(GRAPHICS),$(GAMEDIR)/$(dir)) \
 			$(foreach dir,$(DATA),$(GAMEDIR)/$(dir)) \
-			$(foreach dir,$(ENGINESRC),$(CURDIR)/$(dir))
+			$(foreach dir,$(ENGINESRC),$(ENGINEDIR)/$(dir))
 
 export DEPSDIR	:=	$(GAMEDIR)/$(BUILD)
 
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+CFILES		+=	$(foreach dir,$(ENGINESRC),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
+CPPFILES	+=	$(foreach dir,$(ENGINESRC),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
+SFILES		+=	$(foreach dir,$(ENGINESRC),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.s)))
 PICAFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.v.pica)))
+PICAFILES	+=	$(foreach dir,$(ENGINESRC),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.v.pica)))
 SHLISTFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.shlist)))
+SHLISTFILES	:=	$(foreach dir,$(ENGINESRC),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.shlist)))
 GFXFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.t3s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
@@ -94,14 +100,19 @@ export HFILES	:=	$(PICAFILES:.v.pica=_shbin.h) $(SHLISTFILES:.shlist=_shbin.h) \
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(GAMEDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+			$(foreach dir,$(ENGINESRC),-I$(ENGINEDIR)/$(dir)) \
 			-I$(GAMEDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
 export _3DSXDEPS	:=	$(if $(NO_SMDH),,$(OUTPUT).smdh)
 
+ifneq ($(strip $(ICON)),)
+	export APP_ICON := $(GAMEDIR)/$(META)/$(ICON)
+else
+	export APP_ICON := 
+endif
 
-export APP_ICON 	:=	$(META)/icon.png
 export BANNER_AUDIO	:=	$(META)/banner.wav
 export BANNER_IMAGE	:=	$(META)/banner.png
 export APP_RSF		:=	$(META)/app.rsf
@@ -111,7 +122,7 @@ ifeq ($(strip $(NO_SMDH)),)
 endif
 
 ifneq ($(ROMFS),)
-	export _3DSXFLAGS += --romfs=$(CURDIR)/$(ROMFS)
+	export _3DSXFLAGS += --romfs=$(GAMEDIR)/$(ROMFS)
 endif
 
 .PHONY: all clean
@@ -119,7 +130,7 @@ endif
 #---------------------------------------------------------------------------------
 all:
 	@mkdir -p $(BUILD) $(GFXBUILD) $(OUTDIR)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(GAMEDIR)/3ds.mk $(OUTPUT).3dsx
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(ENGINEDIR)/3ds_base.mk $(OUTPUT).3dsx
 	@bannertool makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -f "$(ICON_FLAGS)" -o $(BUILD)/icon.icn
 	@bannertool makebanner -i "$(BANNER_IMAGE)" -a "$(BANNER_AUDIO)" -o $(BUILD)/banner.bnr
 	@makerom -f cia -o $(OUTPUT).cia -target t -exefslogo -elf "$(OUTPUT).elf" -rsf "$(APP_RSF)" -ver "$$(($(APP_MAJOR)*1024+$(APP_MINOR)*16+$(APP_PATCH)))" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)" -DAPP_ROMFS="$(ROMFS)" -logo "$(LOGO)"
@@ -183,7 +194,7 @@ endef
 %.t3x	%.h	:	%.t3s
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
-	@tex3ds -i $< -H $*.h -d $*.d -o $(TOPDIR)/$(GFXBUILD)/$*.t3x
+	@tex3ds -i $< -H $*.h -d $*.d -o $(GFXBUILD)/$*.t3x
 
 -include $(DEPSDIR)/*.d
 

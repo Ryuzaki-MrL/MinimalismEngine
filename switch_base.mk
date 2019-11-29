@@ -18,6 +18,7 @@ ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 DEFINES	:=	$(ENGINE_DEFINES) $(GAME_DEFINES)
 
+ENGINEDIR := $(GAMEDIR)/MinimalismEngine
 ENGINESRC := src src/util switch
 
 ifneq ($(strip $(USE_SDL)),)
@@ -30,7 +31,7 @@ CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
 CFLAGS	+=	-D__SWITCH__ $(INCLUDE)
 
 ifneq ($(strip $(USE_SDL)),)
-	CFLAGS += -D_USE_SDL `sdl2-config --cflags`
+	CFLAGS += -D_USE_SDL `sdl2-config --cflags` `aarch64-none-elf-pkg-config --cflags $(SDL_LIBS)`
 endif
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
@@ -41,7 +42,7 @@ LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*
 LIBS	:=	$(EXTRA_LIBS)
 
 ifneq ($(strip $(USE_SDL)),)
-	LIBS += `sdl2-config --libs`
+	LIBS += `sdl2-config --libs` `aarch64-none-elf-pkg-config --libs $(SDL_LIBS)`
 else
 	LIBS += -lnx
 endif
@@ -65,14 +66,17 @@ export TOPDIR	:=	$(GAMEDIR)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(GAMEDIR)/$(dir)) \
 			$(foreach dir,$(DATA),$(GAMEDIR)/$(dir)) \
-			$(foreach dir,$(ENGINESRC),$(CURDIR)/$(dir))
+			$(foreach dir,$(ENGINESRC),$(ENGINEDIR)/$(dir))
 
 export DEPSDIR	:=	$(GAMEDIR)/$(BUILD)
 
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+CFILES		+=	$(foreach dir,$(ENGINESRC),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
+CPPFILES	+=	$(foreach dir,$(ENGINESRC),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+SFILES		+=	$(foreach dir,$(ENGINESRC),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.s)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(ENGINEDIR)/$(dir)/*.*)))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -95,19 +99,29 @@ export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(GAMEDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+			$(foreach dir,$(ENGINESRC),-I$(ENGINEDIR)/$(dir)) \
 			-I$(GAMEDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-export APP_JSON := $(GAMEDIR)/$(META)/config.json
-export APP_ICON := $(GAMEDIR)/$(META)/icon.jpg
+ifneq ($(strip $(CONFIG_JSON)),)
+	export APP_JSON := $(GAMEDIR)/$(META)/$(CONFIG_JSON)
+else
+	export APP_JSON := 
+endif
+
+ifneq ($(strip $(ICON)),)
+	export APP_ICON := $(GAMEDIR)/$(META)/$(ICON)
+else
+	export APP_ICON := 
+endif
 
 ifeq ($(strip $(NO_ICON)),)
 	export NROFLAGS += --icon=$(APP_ICON)
 endif
 
 ifeq ($(strip $(NO_NACP)),)
-	export NROFLAGS += --nacp=$(GAMEDIR)/$(TARGET).nacp
+	export NROFLAGS += --nacp=$(OUTPUT).nacp
 endif
 
 ifneq ($(APP_TITLEID),)
@@ -126,7 +140,7 @@ all: $(BUILD)
 $(BUILD):
 	@mkdir -p $(BUILD) $(GFXBUILD) $(OUTDIR)
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(GAMEDIR)/switch.mk
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(ENGINEDIR)/switch_base.mk
 
 #---------------------------------------------------------------------------------
 clean:
