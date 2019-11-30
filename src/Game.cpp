@@ -14,12 +14,15 @@ Game::~Game() {
 	delete state;
 }
 
-// The game decides if timestep is fixed or variable
+/// The game decides if timestep is fixed or variable
 void Game::update(seconds_t delta) {
 	if (transition) {
 		switch(fadeStatus()) {
-			case FADE_HALFDONE: setState(tmpstate); break;
-			case FADE_DONE: transition = false; break;
+			case FADE_HALFDONE:
+				if (state != tmpstate) setState(tmpstate);
+				break;
+			case FADE_DONE:
+				transition = false; break;
 		}
 	} else {
 		g_deltatime = delta;
@@ -41,8 +44,8 @@ void Game::setStateWithFade(GameState* st, seconds_t time) {
 
 void Game::draw() {
 	Renderer::frameStart();
-	fadeUpdate();
 	state->draw();
+	fadeUpdate();
 	Renderer::frameEnd();
 
 	// fps
