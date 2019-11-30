@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "typedefs.h"
 
@@ -18,14 +19,14 @@ namespace Input {
 
 	void poll();
 
-	bool isKeyDown(key_t key);
+	bool isKeyDown(button_t key);
 	bool isKeyBindDown(uint16_t index);
-	bool isKeyHeld(key_t key);
+	bool isKeyHeld(button_t key);
 	bool isKeyBindHeld(uint16_t index);
-	bool isKeyUp(key_t key);
+	bool isKeyUp(button_t key);
 	bool isKeyBindUp(uint16_t index);
 
-	void keyBind(uint16_t index, key_t key);
+	void keyBind(uint16_t index, button_t key);
 	void keyUnbind(uint16_t index);
 
 	uint16_t getTouchX();

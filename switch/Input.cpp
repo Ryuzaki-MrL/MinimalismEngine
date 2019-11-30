@@ -6,14 +6,14 @@
 
 namespace Input {
 
-static key_t kDown;
-static key_t kHeld;
-static key_t kUp;
+static button_t kDown;
+static button_t kHeld;
+static button_t kUp;
 static touchPosition touch;
 static JoystickPosition joypad[2];
 static SixAxisSensorValues sas;
 
-static key_t kBinds[MAX_KEYBINDS];
+static button_t kBinds[MAX_KEYBINDS];
 
 bool init() {
 	hidInitialize();
@@ -38,7 +38,7 @@ void poll() {
 	hidSixAxisSensorValuesRead(&sas, CONTROLLER_P1_AUTO, 1);
 }
 
-bool isKeyDown(key_t key) {
+bool isKeyDown(button_t key) {
 	return (kDown & key);
 }
 
@@ -46,7 +46,7 @@ bool isKeyBindDown(uint16_t index) {
 	return (kDown & kBinds[index]);
 }
 
-bool isKeyHeld(key_t key) {
+bool isKeyHeld(button_t key) {
 	return (kHeld & key);
 }
 
@@ -54,7 +54,7 @@ bool isKeyBindHeld(uint16_t index) {
 	return (kHeld & kBinds[index]);
 }
 
-bool isKeyUp(key_t key) {
+bool isKeyUp(button_t key) {
 	return (kUp & key);
 }
 
@@ -62,7 +62,7 @@ bool isKeyBindUp(uint16_t index) {
 	return (kUp & kBinds[index]);
 }
 
-void keyBind(uint16_t index, key_t key) {
+void keyBind(uint16_t index, button_t key) {
 	kBinds[index] = key;
 }
 
@@ -79,11 +79,11 @@ uint16_t getTouchY() {
 }
 
 axis_t getStickAxisX(uint8_t stick) {
-	return cpad[stick].dx;
+	return joypad[stick].dx;
 }
 
 axis_t getStickAxisY(uint8_t stick) {
-	return cpad[stick].dy;
+	return joypad[stick].dy;
 }
 
 axis_t getAccelX() {
@@ -127,7 +127,7 @@ void setGyroState(bool state) {
 }
 
 bool getString(char* out, const char* htext, const char* def, size_t maxlength, bool password) {
-	SwkbdConfig* kb;
+	SwkbdConfig* kb = nullptr;
 
 	Result res = swkbdCreate(kb, 0);
 	if (R_FAILED(res)) return false;
@@ -151,7 +151,7 @@ bool getString(char* out, const char* htext, const char* def, size_t maxlength, 
 
 bool getInteger(int& out, const char* htext, int def) {
 	static char buffer[12] = "";
-	SwkbdConfig* kb;
+	SwkbdConfig* kb = nullptr;
 
 	Result res = swkbdCreate(kb, 0);
 	if (R_FAILED(res)) return false;

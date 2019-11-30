@@ -38,7 +38,8 @@ SaveData& getGlobalSavedata();
 const SaveProfile& getCurrentSaveProfile();
 #endif
 
-void selectSaveSlot(uint16_t slot); // discards current WorldData
+/// Discards current WorldData
+void selectSaveSlot(uint16_t slot);
 
 WorldData& getCurrentWorldData();
 bool commitCurrentWorldData();

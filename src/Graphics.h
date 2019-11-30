@@ -17,7 +17,8 @@ namespace Renderer {
 	bool init();
 	void fini();
 
-	float get3D(); // For 3DS or any other supported platform
+	/// For 3DS or any other supported platform
+	float get3D();
 
 	void frameStart();
 	void frameEnd();

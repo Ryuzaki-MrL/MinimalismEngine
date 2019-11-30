@@ -1,7 +1,7 @@
 #ifndef CBUFFER_H
 #define CBUFFER_H
 
-// Polymorphism without indirection
+/// Polymorphism without indirection
 template <typename T>
 class ClassBuffer {
   private:

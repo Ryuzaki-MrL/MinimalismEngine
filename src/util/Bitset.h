@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-// Basic, easy to serialize bitset implementation
+/// Basic, easy to serialize bitset implementation
 template <size_t N>
 class Bitset {
   private:
