@@ -3,19 +3,10 @@
 
 #include <stdint.h>
 
+#include "Geometry.h"
 #include "types.h"
 
 // TODO: animations
-
-struct Sprite {
-	Color color;
-	float xscale;
-	float yscale;
-	float rotation;
-	float speed; // spf
-	uint16_t id;
-	uint16_t frame;
-};
 
 struct SpriteData {
 	uint16_t width;
@@ -33,7 +24,25 @@ struct SpriteData {
 };
 
 void spritesLoad(const char* filename);
-
 const SpriteData& spriteGetData(uint16_t id);
+
+struct Sprite {
+	Color color = Color(0xFFFFFFFF);
+	float xscale = 1;
+	float yscale = 1;
+	float xoffs = 0;
+	float yoffs = 0;
+	float rotation = 0;
+	float speed = 0; // spf
+	uint16_t id = 0;
+	uint16_t frame = 0;
+
+	Sprite() {}
+	Sprite(uint16_t id);
+	~Sprite();
+
+	const Rectangle calcBoundingBox() const;
+	const SpriteData& data() const { return spriteGetData(id); }
+};
 
 #endif /* SPRITE_H */

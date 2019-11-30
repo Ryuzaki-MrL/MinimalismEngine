@@ -15,8 +15,10 @@ GameEntity::GameEntity(Scene& scene, uint16_t type):
 	char(_<sizeof(GameEntity)>()); // report size as a compiler warning
 	++s_entcount[type];
 	++s_entgp[group];
-	spr.id = data.sprite;
 	comps.init(data);
+	spr = Sprite(data.sprite);
+	bbox = spr.calcBoundingBox();
+	v = Vector2D(0, 0);
 }
 GameEntity::~GameEntity() {
 	--s_entcount[type];
