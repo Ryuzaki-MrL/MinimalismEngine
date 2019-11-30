@@ -7,7 +7,7 @@ class Camera {
   private:
 	Rectangle dim;
 
-	inline void updateView() { dim.right = dim.left + w; dim.bot = dim.top + h; }
+	inline void updateView() { dim.right = dim.left + width; dim.bot = dim.top + height; }
 
   public:
 	Rectangle lim;
@@ -15,6 +15,7 @@ class Camera {
 	float xspd, yspd;
 	float xorig, yorig;
 	bool locked;
+	bool scrolling;
 
 	Camera();
 	~Camera();
@@ -24,10 +25,9 @@ class Camera {
 	inline void setPosition(float x, float y) { dim.left = x; dim.top = y; updateView(); }
 	inline void translate(float x, float y) { dim.left += x; dim.top += y; updateView(); }
 	inline float getX() const { return dim.left; }
-	inline float getY() const { return dim.right; }
+	inline float getY() const { return dim.top; }
 
 	inline void setSpeed(float x, float y) { xspd = x; yspd = y; }
-	inline bool isScrolling() const { return xspd || yspd; }
 
 	inline void setLimit(const Rectangle& r) { lim = r; }
 	inline const Rectangle& getLimit() const { return lim; }

@@ -16,7 +16,7 @@ struct Tile {
 };
 
 struct TileMapSection {
-	std::vector<const Tile> tiles;
+	std::vector<Tile> tiles;
 };
 
 typedef std::vector<const TileMapSection*> TileMapRegion;
