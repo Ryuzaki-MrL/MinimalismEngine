@@ -16,6 +16,7 @@ bool init() {
 	SDL_InitSubSystem(SDL_INIT_AUDIO);
 	Mix_Init(MIX_INIT_OGG);
 	Mix_OpenAudio(AUDIO_FREQUENCY, MIX_DEFAULT_FORMAT, 2, AUDIO_SAMPLES);
+	return true;
 }
 
 void fini() {

@@ -6,7 +6,7 @@
 
 float g_deltatime;
 
-Game::Game(): framecnt(0), state(nullptr), running(true), transition(false) {
+Game::Game(): framecnt(0), state(nullptr), tmpstate(nullptr), running(true), transition(false) {
 	frametimer.start();
 }
 
@@ -23,7 +23,7 @@ void Game::update(seconds_t delta) {
 		}
 	} else {
 		g_deltatime = delta;
-		Input::update();
+		Input::poll();
 		state->update();
 	}
 }

@@ -4,12 +4,12 @@
 #include "GameEntity.h"
 
 // template for creating entities
-#define NEWENTITY(NAME, TYPE, ...) \
+#define NEWENTITY(NAME, ...) \
 class NAME final: public GameEntity { \
   private:\
 	void __VA_ARGS__; \
   public:\
-	NAME(Level&, uint16_t type = TYPE); \
+	NAME(Scene&, uint16_t); \
 	~NAME(); \
 };
 
