@@ -13,8 +13,8 @@ struct RZDB_File {
 
 struct RZDB_Chunk {
 	char* data;
-	uint16_t cnt;
-	size_t chkidx[];
+	uint32_t cnt;
+	size_t* chkidx;
 };
 
 RZDB_File* RZDB_OpenFile(const char* fname) {
@@ -49,7 +49,7 @@ size_t RZDB_ReadString(RZDB_File* file, char* out) {
 size_t RZDB_ReadSize(RZDB_File* file) {
 	size_t sz = 0;
 	size_t shift = 0;
-	u8 tmp = 0;
+	uint8_t tmp = 0;
 	do {
 		fread(&tmp, 1, sizeof(tmp), file->handle);
 		sz |= (tmp & 0x7F) << shift;
@@ -60,17 +60,18 @@ size_t RZDB_ReadSize(RZDB_File* file) {
 
 RZDB_Chunk* RZDB_ReadChunkIndexed(RZDB_File* file, size_t chksize, size_t cnt) {
 	int pos = ftell(file->handle);
-	RZDB_Chunk* chk = (RZDB_Chunk*)memalloc(sizeof(RZDB_Chunk) + sizeof(size_t) * cnt);
+	RZDB_Chunk* chk = (RZDB_Chunk*)memalloc(sizeof(RZDB_Chunk));
 	if (!chk) return nullptr;
 	chk->cnt = cnt;
+	chk->chkidx = (size_t*)memalloc(sizeof(size_t) * (cnt + 1));
 	chk->chkidx[0] = 0;
-	for (uint16_t i = 1; i <= cnt; ++i) {
+	for (uint32_t i = 1; i <= cnt; ++i) {
 		chk->chkidx[i] = RZDB_ReadSize(file) * chksize;
 		fseek(file->handle, chk->chkidx[i], SEEK_CUR);
 		chk->chkidx[i] += chk->chkidx[i-1] + 1;
 	}
 	fseek(file->handle, pos, SEEK_SET);
-	chk->data = (char*)memalloc(chk->chkidx[cnt]);
+	chk->data = (char*)memalloc(chk->chkidx[cnt] + cnt);
 	if (!chk->data) {
 		memfree(chk);
 		return nullptr;
@@ -93,6 +94,7 @@ size_t RZDB_ChunkGetCount(RZDB_Chunk* chunk) {
 
 void RZDB_FreeChunk(RZDB_Chunk* chunk) {
 	if (!chunk) return;
+	memfree(chunk->chkidx);
 	memfree(chunk->data);
 	memfree(chunk);
 }
