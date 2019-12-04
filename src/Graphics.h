@@ -31,6 +31,7 @@ namespace Renderer {
 	void targetClear(uint32_t color);
 	void targetBlend(uint32_t color);
 	void targetResize(uint32_t w, uint32_t h);
+	void targetPosition(float x, float y);
 	void targetTranslate(float x, float y);
 
 	void drawTriangle(float x0, float y0, float x1, float y1, float x2, float y2, uint32_t color, float depth = 0.0f);
@@ -51,7 +52,7 @@ namespace Renderer {
 	/* Resources */
 	void texsheetAdd(const char* name, uint16_t index);
 	void texsheetUnload(uint16_t index);
-	void fontAdd(const char* name, uint16_t index, size_t size);
+	void fontAdd(const char* name, uint16_t index, uint16_t sheet);
 	void fontUnload(uint16_t index);
 };
 

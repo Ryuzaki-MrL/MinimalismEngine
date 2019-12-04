@@ -267,10 +267,8 @@ void texsheetUnload(uint16_t index) {
 	}
 }
 
-void fontAdd(const char* name, uint16_t index, size_t /* size */) {
-	static char sheetpath[256] = "";
-	sprintf(sheetpath, "%s.t3x", name);
-	s_fonts[index] = RZFT_LoadFont(name, sheetpath);
+void fontAdd(const char* name, uint16_t index, uint16_t sheet) {
+	s_fonts[index] = RZFT_LoadFont(name, sheet);
 }
 
 void fontUnload(uint16_t index) {

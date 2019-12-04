@@ -31,7 +31,6 @@ static std::unordered_map<uint16_t, SDL_SpriteSheet> s_sheets;
 bool init() {
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-	TTF_Init();
 
 	ctx.window = SDL_CreateWindow("sdl2_gles2", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 	if (!ctx.window) return false;
@@ -52,7 +51,6 @@ void fini() {
 	SDL_DestroyRenderer(ctx.renderer);
 	SDL_DestroyWindow(ctx.window);
 
-	TTF_Quit();
 	IMG_Quit();
 	SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
@@ -230,9 +228,7 @@ void drawTextFormat(uint16_t font, float x, float y, float z, float size, uint32
 	va_start(args, str);
 	vsnprintf(buffer, sizeof(buffer) - 1, str, args);
 
-	s_color = Color(color);
-	s_sdlcol = MAKE_COLOR(s_color);
-	FC_DrawEffect(s_fonts[font].fc, ctx.renderer, x - tx, y - ty, FC_MakeEffect(align, FC_MakeScale(size, size), s_sdlcol), buffer);
+	RZFT_DrawText(s_fonts[font].rzft, x, y, size, size, color, -1, align, buffer);
 
 	va_end(args);
 }
@@ -250,8 +246,8 @@ void texsheetUnload(uint16_t index) {
 	}
 }
 
-void fontAdd(const char* name, uint16_t index, size_t size) {
-	s_fonts[index].load(ctx.renderer, name, size);
+void fontAdd(const char* name, uint16_t index, uint16_t sheet) {
+	s_fonts[index].load(name, sheet);
 }
 
 void fontUnload(uint16_t index) {
