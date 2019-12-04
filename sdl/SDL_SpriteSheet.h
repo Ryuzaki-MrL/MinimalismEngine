@@ -36,7 +36,7 @@ class SDL_SpriteSheet {
 	}
 
 	inline SDL_Texture* getTextureSheet() const { return sheet; }
-	inline const SDL_Rect* getTexturePart(uint16_t id) const { return &tex[id]; }
+	inline const SDL_Rect* getTexturePart(uint16_t id) const { return (tex+id); }
 };
 
 #endif /* SDLSHEET_H */

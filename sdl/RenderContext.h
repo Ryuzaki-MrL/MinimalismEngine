@@ -16,7 +16,8 @@
 typedef SDL_Window* Screen;
 
 struct RenderContext {
-	float tx, ty;
+	float tx = 0;
+	float ty = 0;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 };
