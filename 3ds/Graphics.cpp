@@ -3,6 +3,8 @@
 
 #include "Graphics.h"
 #include "Geometry.h"
+#include "SpriteSheet.h"
+#include "rzft.h"
 
 namespace Renderer {
 
@@ -12,9 +14,10 @@ static C2D_TextBuf staticbuf;
 static std::unordered_map<const char*, C2D_Text> txtready; // using a pointer as key is intended here
 static C2D_ImageTint s_tint;
 static C2D_DrawParams s_params;
+static float s_3dside = 1.0;
 
 static std::unordered_map<uint16_t, RZFT_Font*> s_fonts;
-static std::unordered_map<uint16_t, C2D_SpriteSheet> s_sheets;
+static std::unordered_map<uint16_t, SpriteSheet> s_sheets;
 
 static void cacheTextForRendering(const char* str) {
 	if (!staticbuf) {
@@ -32,11 +35,19 @@ bool init() {
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
 
+	// custom color modulation
+	C3D_TexEnv* env = C3D_GetTexEnv(2);
+	C3D_TexEnvInit(env);
+	C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_PRIMARY_COLOR, GPU_TEXTURE3);
+	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+
 	ctx.top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	ctx.right = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
 	ctx.bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 
 	ctx.internalbuf = C2D_TextBufNew(256);
+
+	return true;
 }
 
 void fini() {
@@ -94,8 +105,14 @@ void targetBlend(uint32_t color) {
 }
 
 void targetResize(uint32_t w, uint32_t h) {
-	C2D_SceneSize(ctx.tw = w, ctx.th = h, ctx.currtarg->linked);
+	if (ctx.tw == w && ctx.th == h) return;
+	C2D_SceneSize(ctx.tw = h, ctx.th = w, ctx.currtarg->linked);
 	C2D_TargetClear(ctx.currtarg, C_WHITE);
+}
+
+void targetPosition(float x, float y) {
+	ctx.tx = x;
+	ctx.ty = y;
 }
 
 void targetTranslate(float x, float y) {
@@ -121,14 +138,15 @@ void drawEllipse(float x, float y, float w, float h, uint32_t color, float depth
 }
 
 void drawTexture(uint16_t sheet, uint16_t id, float x, float y, float depth) {
-	C2D_DrawImageAt(C2D_SpriteSheetGetImage(s_sheets[sheet], id), x - ctx.tx, y - ctx.ty, depth);
+	C2D_PlainImageTint(&s_tint, C_WHITE, 0.0f);
+	C2D_DrawImageAt(C2D_SpriteSheetGetImage(s_sheets[sheet].get(), id), x - ctx.tx, y - ctx.ty, depth, &s_tint);
 }
 
 void drawTextureExt(uint16_t sheet, uint16_t id, float x, float y, float xorig, float yorig, float xscale, float yscale, float angle, uint32_t color, float depth) {
 	C2D_PlainImageTint(&s_tint, color, 0.0f);
-	C2D_Image img = C2D_SpriteSheetGetImage(s_sheets[sheet], id);
+	C2D_Image img = C2D_SpriteSheetGetImage(s_sheets[sheet].get(), id);
 	s_params = {
-		{ x+xorig - ctx.tx, y+yorig - ctx.ty, xscale*img.subtex->width, yscale*img.subtex->height },
+		{ floor(x+xorig - ctx.tx), floor(y+yorig - ctx.ty), xscale*img.subtex->width, yscale*img.subtex->height },
 		{ xorig, yorig },
 		depth, degtorad(-angle)
 	};
@@ -136,12 +154,13 @@ void drawTextureExt(uint16_t sheet, uint16_t id, float x, float y, float xorig, 
 }
 
 void drawTextureFill(uint16_t sheet, uint16_t id, float depth) {
-	C2D_Image img = C2D_SpriteSheetGetImage(s_sheets[sheet], id);
+	C2D_PlainImageTint(&s_tint, C_WHITE, 0.0f);
+	C2D_Image img = C2D_SpriteSheetGetImage(s_sheets[sheet].get(), id);
 	int txi = ctx.tx;
 	int tyi = ctx.ty;
-	for (int x = 0; x <= ctx.tw; x += img.subtex->width) {
-		for (int y = 0; y <= ctx.th; y += img.subtex->height) {
-			C2D_DrawImageAt(img, x - (txi % img.subtex->width), y - (tyi % img.subtex->height), depth);
+	for (uint32_t x = 0; x <= ctx.tw; x += img.subtex->width) {
+		for (uint32_t y = 0; y <= ctx.th; y += img.subtex->height) {
+			C2D_DrawImageAt(img, x - (txi % img.subtex->width), y - (tyi % img.subtex->height), depth, &s_tint);
 		}
 	}
 }
@@ -150,10 +169,10 @@ void drawTargetTexture(uint16_t targ, float x, float y, const Rectangle& region,
 	// TODO
 }
 
-void drawSprite(const Sprite& sprite, float x, float y, float depth = 0.0f) {
-	const SpriteData& data = spriteGetData(sprite.id);
-	uint16_t frame = data.texture + (sprite.frame % data.imgcount);
-	drawTextureExt(data.sheet, frame, x, y, data.xorig, data.yorig, sprite.xscale, sprite.yscale, sprite.rotation, sprite.color.rgba, depth);
+void drawSprite(const Sprite& spr, float x, float y, float depth) {
+	const SpriteData& data = spr.data();
+	uint16_t frame = data.texture + (spr.frame % data.imgcount);
+	drawTextureExt(data.sheet, frame, x, y, spr.xoffs, spr.yoffs, spr.xscale, spr.yscale, spr.rotation, spr.color.rgba, depth);
 }
 
 void drawTileMap(const TileMap& tmap, const Rectangle& region, float depth) {
@@ -166,11 +185,35 @@ void drawTileMap(const TileMap& tmap, const Rectangle& region, float depth) {
 }
 
 void drawTile(const Tile& tile, float depth) {
-	C2D_Image img = C2D_SpriteSheetGetImage(s_sheets[tile.sheet], 0); // use first texture as reference
-	int sx = ROUND(int(tile.dim.top), img.subtex->width, 0);
-	int sy = ROUND(int(region.left), img.subtex->height, 0);
+	const SpriteSheet& ssheet = s_sheets[tile.sheet + tile.texture];
+	C2D_SpriteSheet tsheet = ssheet.get();
+	C2D_Image img = C2D_SpriteSheetGetImage(tsheet, 0); // use first tile as reference
 
-	// TODO: iterate through spritesheet and draw each piece of the tile
+	int isw = img.subtex->width;
+	int ish = img.subtex->height;
+	int sx = tile.dim.left / isw;
+	int sy = tile.dim.top / ish;
+	int sw = tile.dim.right / isw;
+	int sh = tile.dim.bot / ish;
+	float tdx = tile.x;
+	float tdy = tile.y;
+	float xs = tile.xscale*isw;
+	float ys = tile.yscale*ish;
+	if (tile.xscale < 0) tdx += xs;
+	if (tile.yscale < 0) tdy += ys;
+
+	C2D_PlainImageTint(&s_tint, C_WHITE, 0.0f);
+
+	for (int i = 0; i < sw; ++i) {
+		for (int j = 0; j < sh; ++j) {
+			img = C2D_SpriteSheetGetImage(tsheet, (sy+j)*ssheet.cols + (sx+i));
+			s_params = {
+				{ floor(tdx+i*xs - ctx.tx), floor(tdy+j*ys - ctx.ty), xs, ys },
+				{ 0, 0 }, depth, 0
+			};
+			C2D_DrawImage(img, &s_params, &s_tint);
+		}
+	}
 }
 
 void drawText(uint16_t font, float x, float y, float z, float size, uint32_t color, uint8_t align, const char* str) {
@@ -180,12 +223,12 @@ void drawText(uint16_t font, float x, float y, float z, float size, uint32_t col
 		if (!txtready.count(str)) {
 			cacheTextForRendering(str);
 		}
-		xx = x - w * (align / 2.0);
 		C2D_TextGetDimensions(&txtready[str], size, size, &w, nullptr);
+		xx = x - w * (align / 2.0);
 		C2D_DrawText(&txtready[str], C2D_WithColor, xx - ctx.tx, y - ctx.ty, z, size, size, color);
 	}
 	else {
-		RZFT_DrawText(fnt, x - ctx.tx, y - ctx.ty, z, size, size, color, -1, align, str);
+		RZFT_DrawText(fnt, x, y, size, size, color, -1, align, str);
 	}
 }
 
@@ -199,13 +242,13 @@ void drawTextFormat(uint16_t font, float x, float y, float z, float size, uint32
 	if (!fnt) {
 		float w, xx;
 		C2D_Text tmp;
-		xx = x - w * (align / 2.0);
 		C2D_TextParse(&tmp, ctx.internalbuf, buffer);
 		C2D_TextGetDimensions(&tmp, size, size, &w, nullptr);
+		xx = x - w * (align / 2.0);
 		C2D_DrawText(&tmp, C2D_WithColor, xx - ctx.tx, y - ctx.ty, z, size, size, color);
 	}
 	else {
-		RZFT_DrawText(fnt, x - ctx.tx, y - ctx.ty, z, size, size, color, -1, align, buffer);
+		RZFT_DrawText(fnt, x, y, size, size, color, -1, align, buffer);
 	}
 
 	va_end(args);
@@ -213,12 +256,13 @@ void drawTextFormat(uint16_t font, float x, float y, float z, float size, uint32
 
 
 void texsheetAdd(const char* name, uint16_t index) {
-	s_sheets[index] = C2D_SpriteSheetLoad(name);
+	static char metapath[256] = "";
+	sprintf(metapath, "%s.t", name);
+	s_sheets[index].load(name, metapath);
 }
 
 void texsheetUnload(uint16_t index) {
 	if (s_sheets.count(index)) {
-		C2D_SpriteSheetFree(s_sheets[index]);
 		s_sheets.erase(index);
 	}
 }

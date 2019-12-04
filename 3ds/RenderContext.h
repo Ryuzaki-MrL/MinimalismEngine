@@ -13,6 +13,7 @@
 #define SUBSCREEN_HEIGHT 240
 
 #define DEFAULT_SCREEN {GFX_TOP, GFX_LEFT}
+#define ALT_SCREEN {GFX_BOTTOM, GFX_LEFT}
 
 typedef C3D_RenderTarget RenderTarget;
 
@@ -22,7 +23,9 @@ struct Screen {
 };
 
 struct RenderContext {
-	float tx, ty, tw, th;
+	float tx = 0;
+	float ty = 0;
+	uint32_t tw, th;
 	C3D_RenderTarget* top;
 	C3D_RenderTarget* right;
 	C3D_RenderTarget* bot;
