@@ -43,6 +43,27 @@ inline T clamp(const T& val, const T& low, const T& hi) {
 }
 
 
+/// Point
+struct Point {
+	float x, y;
+
+	Point(float x, float y): x(x), y(y) {}
+	~Point() {}
+
+	inline void translate(float xx, float yy) {
+		x += xx; y += yy;
+	}
+
+	inline void rotate(float angle) {
+		float a = degtorad(angle);
+		float nx = (x * cos(a) - y * sin(a));
+		float ny = (y * cos(a) + x * sin(a));
+		x = nx;
+		y = ny;
+	}
+};
+
+
 /// Rectangle
 struct Rectangle {
 	float left, right, top, bot;
@@ -57,10 +78,6 @@ struct Rectangle {
 
 	inline bool isInside(float x, float y) const {
 		return (x > left && x < right && y > top && y < bot);
-	}
-
-	inline bool isInside(const Rectangle& other) const {
-		return (other.left >= left) && (other.right <= right) && (other.top >= top) && (other.bot <= bot);
 	}
 
 	inline const Rectangle operator+(const Rectangle other) const {
