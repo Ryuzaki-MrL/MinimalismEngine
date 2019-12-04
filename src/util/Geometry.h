@@ -16,12 +16,20 @@ inline float radtodeg(float rad) {
 	return rad * 180.0 / PI;
 }
 
+inline float dsin(float deg) {
+	return sin(degtorad(deg));
+}
+
+inline float dcos(float deg) {
+	return cos(degtorad(deg));
+}
+
 inline float pointDistance(float x1, float y1, float x2, float y2) {
 	return ((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
 }
 
 inline float pointDirection(float x1, float y1, float x2, float y2) {
-	return -(atan2(y2-y1, x2-x1) * 180.0 / PI) + 180.0;
+	return 180 - (atan2(y2-y1, x2-x1) * 180.0 / PI);
 }
 
 template <typename T>
@@ -31,7 +39,7 @@ inline int signum(const T& val) {
 
 template <typename T>
 inline T clamp(const T& val, const T& low, const T& hi) {
-	return ((val < low) ? low : ((val > hi) ? hi : val));
+	return ((val < low) ? low : ((hi < val) ? hi : val));
 }
 
 
@@ -76,8 +84,8 @@ struct Vector2D {
 	inline void rotate(float d) { dir += d; }
 	inline void scale(float m) { mag *= m; }
 
-	inline float getX() const { return mag * cos(degtorad(dir)); }
-	inline float getY() const { return mag * -sin(degtorad(dir)); }
+	inline float getX() const { return mag * +dcos(dir); }
+	inline float getY() const { return mag * -dsin(dir); }
 
 	inline const Vector2D operator+(const Vector2D other) {
 		float nx = getX() + other.getX();
