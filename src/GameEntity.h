@@ -12,9 +12,20 @@
 #define ENTITY_TIMERS	1
 #endif
 
-#define EFLAG_DEAD		0b00000001
-#define EFLAG_VISIBLE	0b00000010
-#define EFLAG_SOLID		0b00000100
+#define ANIM_FPS(x)		(1.0 / (x))
+
+#define TR_SPRITE		0b01
+#define TR_BBOX			0b10
+#define TR_ALL			0b11
+
+#define CHECK_SOLID		true
+
+/// Game defined flags should start from bit 3
+enum {
+	EFLAG_VISIBLE	= (1 << 0),
+	EFLAG_SOLID		= (1 << 1),
+	EFLAG_NOUPDATE	= (1 << 2),
+};
 
 class Scene;
 class GameEntity {
@@ -31,8 +42,10 @@ class GameEntity {
 	const EntityData& data;
 	const uint16_t uid;
 	const uint16_t type;
+	uint16_t flags;
+  private:
 	uint8_t group;
-	uint8_t flags;
+	bool dead;
 
   private:
 	virtual void onUpdate() {}
@@ -71,12 +84,13 @@ class GameEntity {
 	inline bool hasComponent(uint16_t comp) const { return data.comps & comp; }
 	inline bool hasProperty(uint16_t prop) const { return data.props & prop; }
 
-	inline void kill() { BIT_SET(flags, EFLAG_DEAD); onKill(); }
-	inline bool isDead() const { return BIT_TEST(flags, EFLAG_DEAD); }
+	inline void kill() { dead = true; onKill(); }
+	inline bool isDead() const { return dead; }
 
-	inline void setFlag(uint8_t mask) { BIT_SET(flags, mask & ~EFLAG_DEAD); }
-	inline void clearFlag(uint8_t mask) { BIT_CLEAR(flags, mask & ~EFLAG_DEAD); }
-	inline bool checkFlag(uint8_t mask) const { return BIT_TEST(flags, mask); }
+	inline void setFlag(uint16_t mask) { BIT_SET(flags, mask); }
+	inline void clearFlag(uint16_t mask) { BIT_CLEAR(flags, mask); }
+	inline bool checkFlag(uint16_t mask) const { return BIT_TEST(flags, mask); }
+	inline bool hasFlag(uint16_t mask) const { return BIT_ANY(flags, mask); }
 
 	inline bool collideWith(const Rectangle& r) const { return r.collideWith(getBoundingBox()); }
 	inline bool collideWith(const GameEntity& obj) const { return obj.collideWith(getBoundingBox()); }

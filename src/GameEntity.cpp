@@ -11,7 +11,7 @@ static uint16_t s_entcount[NUM_ENTITIES] = { 0 };
 static uint16_t s_entgp[GROUP_COUNT] = { 0 };
 
 GameEntity::GameEntity(Scene& scene, uint16_t type):
-  animtime(0), scene(scene), data(entityGetData(type)), uid(++s_nextuid), type(type), group(0), flags(data.flags) {
+  scene(scene), data(entityGetData(type)), uid(++s_nextuid), type(type), group(0), dead(false) {
 	char(_<sizeof(GameEntity)>()); // report size as a compiler warning
 	++s_entcount[type];
 	++s_entgp[group];
@@ -19,6 +19,7 @@ GameEntity::GameEntity(Scene& scene, uint16_t type):
 	spr = Sprite(data.sprite);
 	bbox = spr.calcBoundingBox();
 	v = Vector2D(0, 0);
+	flags = data.flags;
 }
 GameEntity::~GameEntity() {
 	--s_entcount[type];
@@ -57,6 +58,8 @@ bool GameEntity::applyVector(bool checksolid) {
 }
 
 void GameEntity::update() {
+	if (checkFlag(EFLAG_NOUPDATE)) return;
+
 	for (uint8_t i = 0; i < ENTITY_TIMERS; ++i) {
 		if (timers[i].update(g_deltatime) && timers[i].complete()) {
 			timers[i].stop();
