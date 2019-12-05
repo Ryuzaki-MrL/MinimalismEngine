@@ -6,6 +6,7 @@
 #include "Properties.h"
 #include "Geometry.h"
 #include "Sprite.h"
+#include "Timer.h"
 
 #ifndef ENTITY_TIMERS
 #define ENTITY_TIMERS	1

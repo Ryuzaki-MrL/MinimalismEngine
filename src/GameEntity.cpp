@@ -63,11 +63,23 @@ void GameEntity::update() {
 			onTimeOut(i);
 		}
 	}
-	if (animtimer.update() && animtimer.complete()) {
+
+	if (animtimer.update(g_deltatime) && animtimer.complete()) {
 		animtimer.start(spr.speed);
 		++spr.frame;
+		if (spr.frame >= spr.data().imgcount) {
+			spr.frame = 0;
+			onAnimEnd();
+		}
+	}
+	if (spr.speed > 0.0001) {
+		if (!animtimer.isRunning()) animtimer.start(spr.speed);
 	}
 	comps.update();
+	else {
+		animtimer.stop();
+	}
+
 	onUpdate();
 }
 
