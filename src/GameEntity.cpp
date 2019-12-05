@@ -15,11 +15,13 @@ GameEntity::GameEntity(Scene& scene, uint16_t type):
 	char(_<sizeof(GameEntity)>()); // report size as a compiler warning
 	++s_entcount[type];
 	++s_entgp[group];
-	comps.init(data);
 	spr = Sprite(data.sprite);
 	bbox = spr.calcBoundingBox();
 	v = Vector2D(0, 0);
 	flags = data.flags;
+#ifdef USE_COMPONENTS
+	comps.init();
+#endif
 }
 GameEntity::~GameEntity() {
 	--s_entcount[type];
@@ -78,18 +80,23 @@ void GameEntity::update() {
 	if (spr.speed > 0.0001) {
 		if (!animtimer.isRunning()) animtimer.start(spr.speed);
 	}
-	comps.update();
 	else {
 		animtimer.stop();
 	}
+
+#ifdef USE_COMPONENTS
+	comps.update(*this);
+#endif
 
 	onUpdate();
 }
 
 void GameEntity::draw() {
+#ifdef USE_COMPONENTS
+	comps.draw(*this); // pre-draw
+#endif
 	if (checkFlag(EFLAG_VISIBLE)) {
 		Renderer::drawSprite(spr, x, y);
 	}
-	comps.draw();
 	onDraw();
 }

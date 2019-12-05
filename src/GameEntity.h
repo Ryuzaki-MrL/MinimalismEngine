@@ -30,7 +30,9 @@ enum {
 class Scene;
 class GameEntity {
   public:
+#ifdef USE_COMPONENTS
 	Components comps;
+#endif
 	DeltaTimer timers[ENTITY_TIMERS];
 	Sprite spr;
 	Rectangle bbox;
