@@ -4,6 +4,10 @@
 
 #define GROUP_COUNT 256
 
+#ifndef NUM_ENTITIES
+#define NUM_ENTITIES 256
+#endif
+
 template<int N> struct _{ operator char() { return N + 256; } };
 
 static uint16_t s_nextuid = 0;
@@ -42,20 +46,34 @@ void GameEntity::setGroup(uint8_t gp) {
 	++s_entgp[group];
 }
 
-bool GameEntity::moveCheck(float x, float y) {
-	if (!scene.checkSolid(getBoundingBox(this->x + x, this->y + y), uid)) {
+void GameEntity::setScale(float xx, float yy, uint8_t flags) {
+	spr.xscale = xx;
+	spr.yscale = yy;
+	if (BIT_TEST(flags, TR_BBOX)) {
+		bbox = spr.calcBoundingBox();
+	}
+}
+
+void GameEntity::setAngle(float deg, uint8_t flags) {
+	spr.rotation = deg;
+	if (BIT_TEST(flags, TR_BBOX)) {
+		bbox = spr.calcBoundingBox();
+	}
+}
+
+bool GameEntity::moveCheck(float x, float y, uint16_t ef, uint16_t cf) {
+	const Rectangle tmpbox = getBoundingBox(this->x + x, this->y + y);
+	if (!scene.checkPlace(tmpbox, uid, ef, cf)) {
 		translate(x, y);
-		onMove();
 		return true;
 	}
 	return false;
 }
 
-bool GameEntity::applyVector(bool checksolid) {
+bool GameEntity::applyVector(bool checksolid, uint16_t ef, uint16_t cf) {
 	if (checksolid)
-		return moveCheck(v.getX(), v.getY());
+		return moveCheck(v.getX(), v.getY(), ef, cf);
 	translate(v.getX(), v.getY());
-	onMove();
 	return true;
 }
 

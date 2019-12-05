@@ -49,14 +49,11 @@ class GameEntity {
 	uint8_t group;
 	bool dead;
 
-  private:
 	virtual void onUpdate() {}
 	virtual void onDraw() {}
 
 	virtual void onKill() {}
 
-	virtual void onMove() {}
-	virtual void onInteract(GameEntity& /* other */) {}
 	virtual void onTimeOut(uint8_t /* timer */) {}
 	virtual void onAnimEnd() {}
 
@@ -75,13 +72,18 @@ class GameEntity {
 	inline void setPosition(float x, float y) { this->x = x; this->y = y; }
 	inline void resetPosition(float x, float y) { this->x = xs = x; this->y = ys = y; }
 	inline void resetPosition() { x = xs; y = ys; }
-	bool moveCheck(float x, float y);
-	bool applyVector(bool checksolid = false);
+	bool moveCheck(float x, float y, uint16_t ef = 0, uint16_t cf = 0);
+	bool applyVector(bool checksolid = false, uint16_t ef = 0, uint16_t cf = 0);
+
+	void setScale(float xx, float yy, uint8_t flags = TR_ALL);
+	void setAngle(float deg, uint8_t flags = TR_ALL);
 
 	inline const Rectangle getBoundingBox(float xx, float yy) const { return bbox + Rectangle(xx, xx, yy, yy); }
-	inline const Rectangle getBoundingBox() const { return getBoundingBox(pos.x, pos.y); }
+	inline const Rectangle getBoundingBox() const { return getBoundingBox(x, y); }
 
 	virtual void onLoad() {}
+	virtual void onUserEvent(uint8_t /* id */) {}
+	virtual void onInteract(GameEntity& /* other */) {}
 
 	inline bool hasComponent(uint16_t comp) const { return data.comps & comp; }
 	inline bool hasProperty(uint16_t prop) const { return data.props & prop; }

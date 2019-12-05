@@ -7,7 +7,7 @@ struct EntityData {
 	uint16_t comps;
 	uint16_t props;
 	uint16_t sprite;
-	uint8_t flags;
+	uint16_t flags;
 };
 
 void entitiesLoad(const char* fname);
