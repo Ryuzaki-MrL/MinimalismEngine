@@ -3,7 +3,9 @@
 
 #define BIT_SET(x, b) 	((x) |= (b))
 #define BIT_TEST(x, b) 	(((x) & (b)) == (b))
+#define BIT_ANY(x, b)	(((x) & (b)) != (0))
 #define BIT_CLEAR(x, b) ((x) &= ~(b))
+#define BIT_COUNT(x)	(__builtin_popcount(x))
 
 extern float g_deltatime;
 
