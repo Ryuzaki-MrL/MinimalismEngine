@@ -8,13 +8,17 @@
 #include "ObjectPool.h"
 #include "Tilemap.h"
 
-// Generic bbox collision
+#define FLAG_ANY false
+#define FLAG_ALL true
+
+/// Generic bbox collision
 struct SceneCollision {
 	Rectangle bbox;
 	uint16_t flags;
 };
 
 typedef std::function<void(GameEntity&)> EntityFn;
+typedef std::function<bool(const GameEntity&)> EntityFinder;
 typedef std::vector<SceneCollision> CollisionMap;
 
 class Scene {
@@ -38,10 +42,13 @@ class Scene {
 	size_t countActive(uint16_t type) const;
 	void instanceActiveRegion(const Rectangle&);
 
-	bool checkTile(const Rectangle& bbox, uint16_t flags) const;
-	bool checkCollision(const Rectangle& bbox, uint16_t flags) const;
-	const GameEntity* checkObject(const Rectangle& bbox, uint16_t except, uint8_t flags = 0) const;
-	void collisionHandle(const Rectangle& bbox, uint16_t except, EntityFn colfn);
+	bool checkTile(const Rectangle&, uint16_t flags, bool flmode = FLAG_ALL) const;
+	bool checkCollision(const Rectangle&, uint16_t flags, bool flmode = FLAG_ALL) const;
+	GameEntity* checkObject(const Rectangle&, uint16_t except, EntityFinder);
+	bool checkPlace(const Rectangle&, uint16_t except, uint16_t ef, uint16_t cf);
+	void onCollision(const Rectangle&, uint16_t except, EntityFn);
+
+	GameEntity* find(EntityFinder);
 	void foreach(EntityFn, int group = -1);
 
 	void update();

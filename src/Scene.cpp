@@ -13,7 +13,7 @@ Scene::~Scene() {}
 
 GameEntity* Scene::instanceCreate(float x, float y, uint16_t id) {
 	GameEntity* obj = pool.create(id, *this);
-	if (obj) obj->setPosition(x, y);
+	if (obj) obj->resetPosition(x, y);
 	return obj;
 }
 
@@ -32,38 +32,65 @@ size_t Scene::countActive(uint16_t type) const {
 
 void Scene::instanceActiveRegion(const Rectangle& region) {
 	pool.buildActiveList([region](GameEntity& ent) -> bool {
-		return region.isInside(ent.getBoundingBox()) || region.collideWith(ent.getBoundingBox());
+		return ent.collideWith(region);
 	});
 }
 
-bool Scene::checkTile(const Rectangle& bbox, uint16_t flags) const {
+bool Scene::checkTile(const Rectangle& bbox, uint16_t flags, bool flmode) const {
 	// TODO
 }
 
-bool Scene::checkCollision(const Rectangle& bbox, uint16_t flags) const {
+bool Scene::checkCollision(const Rectangle& bbox, uint16_t flags, bool flmode) const {
+	// TODO: optimize static collision checking
 	for (const SceneCollision& col : colmap) {
-		if (BIT_TEST(col.flags, flags) && col.bbox.collideWith(bbox)) {
+		if ((
+				(flmode && BIT_TEST(col.flags, flags)) ||
+				(!flmode && BIT_ANY(col.flags, flags))
+			)
+			&& col.bbox.collideWith(bbox)
+		) {
 			return true;
 		}
 	}
 	return false;
 }
 
-const GameEntity* Scene::checkObject(const Rectangle& bbox, uint16_t except, uint8_t flags) const {
+GameEntity* Scene::checkObject(const Rectangle& bbox, uint16_t except, EntityFinder entfn) {
 	for (size_t i : pool.getActiveList()) {
-		if (pool[i]->getUID()!=except && pool[i]->collideWith(bbox) && pool[i]->checkFlag(flags)) {
-			return pool[i];
+		GameEntity* ent = pool[i];
+		if (ent->getUID()!=except && ent->collideWith(bbox) && entfn(*ent)) {
+			return ent;
 		}
 	}
 	return nullptr;
 }
 
-void Scene::collisionHandle(const Rectangle& bbox, uint16_t except, EntityFn colfn) {
+bool Scene::checkPlace(const Rectangle& bbox, uint16_t except, uint16_t ef, uint16_t cf) {
+	return (
+		nullptr != checkObject(bbox, except, [ef](const GameEntity& ent) {
+			return ent.hasFlag(ef);
+		})
+		|| checkCollision(bbox, cf, FLAG_ANY)
+	);
+}
+
+void Scene::onCollision(const Rectangle& bbox, uint16_t except, EntityFn colfn) {
 	for (size_t i : pool.getActiveList()) {
 		if (pool[i]->getUID()!=except && pool[i]->collideWith(bbox)) {
 			colfn(*pool[i]);
 		}
 	}
+}
+
+/// Checks ALL entities, not only active
+GameEntity* Scene::find(EntityFinder entfn) {
+	for (size_t i = 0; i < pool.getCount(); ++i) {
+		GameEntity* ent = pool[i];
+		if (!ent->isDead() && entfn(*ent)) {
+			return ent;
+		}
+	}
+	return nullptr;
 }
 
 void Scene::foreach(EntityFn entfn, int group) {
@@ -83,14 +110,9 @@ void Scene::update() {
 }
 
 void Scene::draw() {
-	//Renderer::targetResize(camera.width, camera.height);
-	Renderer::targetTranslate(camera.getX(), camera.getY());
-
 	Renderer::drawTileMap(tilemap, camera.getViewport());
 
 	for (size_t i : pool.getActiveList()) {
 		pool[i]->draw();
 	}
-
-	Renderer::targetTranslate(-camera.getX(), -camera.getY());
 }
