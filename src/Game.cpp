@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Fading.h"
 #include "System.h"
+#include "Audio.h"
 #include "Graphics.h"
 
 float g_deltatime;
@@ -28,11 +29,12 @@ void Game::update(seconds_t delta) {
 		g_deltatime = delta;
 		Input::poll();
 		state->update();
+		Audio::processQueue();
 	}
 }
 
 void Game::setState(GameState* st) {
-	delete state;
+	if (state) delete state;
 	state = st;
 }
 

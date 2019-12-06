@@ -12,6 +12,8 @@
 #define AUDIO_FREQUENCY	22050
 #endif
 
+#define CHANNEL_ANY (-1)
+
 struct QueuedSound {
 	uint16_t id;
 	int channel;
@@ -22,8 +24,8 @@ namespace Audio {
 	bool init();
 	void fini();
 
-	void playSound(uint16_t id, int channel, int loops);
-	void queueSound(uint16_t id, int channel, int loops);
+	void playSound(uint16_t id, int channel = -1, int loops = 0);
+	void queueSound(uint16_t id, int channel = -1, int loops = 0);
 	void stopSound(int channel);
 
 	void processQueue();
