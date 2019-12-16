@@ -17,11 +17,12 @@ static button_t kBinds[MAX_KEYBINDS];
 
 bool init() {
 	hidInitialize();
-	hidInitializeSevenSixAxisSensor();
+	//hidInitializeSevenSixAxisSensor();
+	return true;
 }
 
 void fini() {
-	hidFinalizeSevenSixAxisSensor();
+	//hidFinalizeSevenSixAxisSensor();
 	hidExit();
 }
 
@@ -32,8 +33,8 @@ void poll() {
 	kHeld = hidKeysHeld(CONTROLLER_P1_AUTO);
 	kUp = hidKeysUp(CONTROLLER_P1_AUTO);
 
-	hidJoystickRead(&joypad[0], CONTROLLER_P1_AUTO, 0);
-	hidJoystickRead(&joypad[1], CONTROLLER_P1_AUTO, 1);
+	hidJoystickRead(&joypad[0], CONTROLLER_P1_AUTO, JOYSTICK_LEFT);
+	hidJoystickRead(&joypad[1], CONTROLLER_P1_AUTO, JOYSTICK_RIGHT);
 	hidTouchRead(&touch, 0);
 	hidSixAxisSensorValuesRead(&sas, CONTROLLER_P1_AUTO, 1);
 }
