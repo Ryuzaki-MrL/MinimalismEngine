@@ -1,6 +1,8 @@
 #ifndef SAVEDATA_H
 #define SAVEDATA_H
 
+#include <stdint.h>
+
 /* Game specific */
 #ifdef USE_SAVEDATA
 #include "SaveTypes.h"

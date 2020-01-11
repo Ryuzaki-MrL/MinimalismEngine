@@ -1,4 +1,4 @@
-#include "TileMap.h"
+#include "Tilemap.h"
 #include "Graphics.h"
 
 #define GET_SECTION(x, y) (((((y) / sec_height) * sec_cols) + ((x) / sec_width)) % (sec_cols * sec_rows))

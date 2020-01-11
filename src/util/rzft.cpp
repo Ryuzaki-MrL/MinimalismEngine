@@ -1,6 +1,7 @@
 /// Custom font format (RyuZaki FonT)
 
 #include <unordered_map>
+#include <string.h>
 
 #include "rzft.h"
 #include "mem.h"

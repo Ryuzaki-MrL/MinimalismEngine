@@ -2,6 +2,7 @@
 #define TILEMAP_H
 
 #include <vector>
+#include <stdint.h>
 
 #include "Geometry.h"
 
