@@ -1,4 +1,7 @@
+#ifndef _SDL_IGNORE_PRIMITIVES
 #include <SDL2/SDL2_gfxPrimitives.h>
+#endif
+
 #include <unordered_map>
 #include <stdio.h>
 
@@ -32,7 +35,10 @@ bool init() {
 	SDL_InitSubSystem(SDL_INIT_VIDEO);
 	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
 
-	ctx.window = SDL_CreateWindow("sdl2_gles2", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+	ctx.window = SDL_CreateWindow(
+		"sdl2_gles2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_BORDERLESS
+	);
 	if (!ctx.window) return false;
 
 	uint32_t flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE;
@@ -122,7 +128,9 @@ void targetTranslate(float x, float y) {
 }
 
 void drawTriangle(float x0, float y0, float x1, float y1, float x2, float y2, uint32_t color, float depth) {
+#ifndef _SDL_IGNORE_PRIMITIVES
 	filledTrigonColor(ctx.renderer, x0, y0, x1, y1, x2, y2, color);
+#endif
 }
 
 void drawRectangle(float x, float y, float w, float h, uint32_t color, float depth) {
@@ -135,7 +143,9 @@ void drawRectangle(float x, float y, float w, float h, uint32_t color, float dep
 }
 
 void drawEllipse(float x, float y, float w, float h, uint32_t color, float depth) {
+#ifndef _SDL_IGNORE_PRIMITIVES
 	filledEllipseColor(ctx.renderer, x, y, w/2, h/2, color);
+#endif
 }
 
 void drawTexture(uint16_t sheet, uint16_t id, float x, float y, float depth) {
