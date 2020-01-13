@@ -37,6 +37,7 @@ void Scene::instanceActiveRegion(const Rectangle& region) {
 }
 
 bool Scene::checkTile(const Rectangle& bbox, uint16_t flags, bool flmode) const {
+	return false;
 	// TODO
 }
 
