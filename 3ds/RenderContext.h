@@ -7,11 +7,6 @@
 
 #define RGBA8(r, g, b, a) C2D_Color32(r, g, b, a)
 
-#define SCREEN_WIDTH 400
-#define SCREEN_HEIGHT 240
-#define SUBSCREEN_WIDTH 320
-#define SUBSCREEN_HEIGHT 240
-
 #define DEFAULT_SCREEN {GFX_TOP, GFX_LEFT}
 #define ALT_SCREEN {GFX_BOTTOM, GFX_LEFT}
 
