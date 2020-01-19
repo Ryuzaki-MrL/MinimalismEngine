@@ -132,7 +132,7 @@ ifneq ($(ROMFS),)
 	export NROFLAGS += --romfsdir=$(GAMEDIR)/$(ROMFS)
 endif
 
-.PHONY: $(BUILD) clean all
+.PHONY: $(BUILD) clean all clean_output
 
 #---------------------------------------------------------------------------------
 all: $(BUILD)
@@ -147,6 +147,8 @@ clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(OUTDIR)
 
+clean_output:
+	@rm -fr $(OUTDIR)
 
 #---------------------------------------------------------------------------------
 else

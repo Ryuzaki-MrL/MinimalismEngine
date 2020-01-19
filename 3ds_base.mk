@@ -125,7 +125,7 @@ ifneq ($(ROMFS),)
 	export _3DSXFLAGS += --romfs=$(GAMEDIR)/$(ROMFS)
 endif
 
-.PHONY: all clean
+.PHONY: all clean clean_output
 
 #---------------------------------------------------------------------------------
 all:
@@ -138,6 +138,9 @@ all:
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(OUTDIR)
+
+clean_output:
+	@rm -fr $(OUTDIR)
 
 #---------------------------------------------------------------------------------
 else

@@ -14,7 +14,7 @@ endif
 CC := gcc
 CXX := g++
 
-CFLAGS	:=	-g -Wall -Wextra -Wno-psabi -O2 \
+CFLAGS	:=	-g -Wall -Wextra -Wno-sign-compare -Wno-unused-parameter -O2 \
 			-fomit-frame-pointer -ffunction-sections \
 			$(DEFINES)
 
@@ -78,7 +78,7 @@ else
 endif
 
 
-.PHONY: $(BUILD) all clean
+.PHONY: $(BUILD) all clean clean_output
 
 #---------------------------------------------------------------------------------
 all: $(BUILD)
@@ -92,6 +92,9 @@ $(BUILD):
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(OUTDIR)
+
+clean_output:
+	@rm -fr $(OUTPUT).exe
 
 #---------------------------------------------------------------------------------
 else
