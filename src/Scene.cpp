@@ -103,6 +103,14 @@ void Scene::foreach(EntityFn entfn, int group) {
 	}
 }
 
+void Scene::setTrigger(uint16_t id, TriggerFn fn) {
+	triggers[id] = fn;
+}
+
+void Scene::trigger(uint16_t id) {
+	if (triggers.count(id)) triggers[id](flags);
+}
+
 void Scene::update() {
 	for (size_t i : pool.getActiveList()) {
 		pool[i]->update();

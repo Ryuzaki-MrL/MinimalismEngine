@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include <vector>
+#include <unordered_map>
 #include <functional>
 
 #include "Camera.h"
@@ -19,13 +20,16 @@ struct SceneCollision {
 
 typedef std::function<void(GameEntity&)> EntityFn;
 typedef std::function<bool(const GameEntity&)> EntityFinder;
+typedef std::function<void(uint32_t)> TriggerFn;
 typedef std::vector<SceneCollision> CollisionMap;
+typedef std::unordered_map<uint16_t, TriggerFn> TriggerMap;
 
 class Scene {
   public:
 	ObjectPool pool;
 	TileMap tilemap;
 	CollisionMap colmap;
+	TriggerMap triggers;
 	Camera camera;
 	uint32_t width;
 	uint32_t height;
@@ -50,6 +54,9 @@ class Scene {
 
 	GameEntity* find(EntityFinder);
 	void foreach(EntityFn, int group = -1);
+
+	void setTrigger(uint16_t id, TriggerFn);
+	void trigger(uint16_t id);
 
 	void update();
 	void draw();
