@@ -20,6 +20,10 @@ bool loop() {
 	return appletMainLoop();
 }
 
+bool hasFocus() {
+	return true;
+}
+
 uint64_t getTime() {
 	using namespace std::chrono;
 	return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();

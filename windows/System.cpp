@@ -11,6 +11,7 @@
 namespace System {
 
 static char userbasepath[260] = "";
+static bool focus;
 
 bool init() {
 	SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, userbasepath);
@@ -38,9 +39,24 @@ bool loop() {
 			case SDL_MOUSEBUTTONUP:
 				inputPollEvent(event);
 				break;
+			
+			case SDL_WINDOWEVENT: {
+				switch(event.window.event) {
+					case SDL_WINDOWEVENT_FOCUS_GAINED:
+						focus = true;
+						break;
+					case SDL_WINDOWEVENT_FOCUS_LOST:
+						focus = false;
+						break;
+				}
+			}
 		}
 	}
 	return true;
+}
+
+bool hasFocus() {
+	return focus;
 }
 
 uint64_t getTime() {

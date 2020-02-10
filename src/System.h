@@ -4,12 +4,14 @@
 #include <stdint.h>
 
 // TODO: device info (screen size, etc)
+// TODO: init features as needed
 
 namespace System {
 	bool init();
 	void fini();
 
 	bool loop(); // process events, etc
+	bool hasFocus();
 
 	uint64_t getTime(); // TODO: datetime
 	uint16_t getLanguage();

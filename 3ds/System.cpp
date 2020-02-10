@@ -30,6 +30,10 @@ bool loop() {
 	return aptMainLoop();
 }
 
+bool hasFocus() {
+	return !aptIsHomePressed();
+}
+
 uint64_t getTime() {
 	return osGetTime();
 }
