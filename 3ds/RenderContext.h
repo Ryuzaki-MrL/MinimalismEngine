@@ -8,6 +8,7 @@
 #define RGBA8(r, g, b, a) C2D_Color32(r, g, b, a)
 
 #define DEFAULT_SCREEN {GFX_TOP, GFX_LEFT}
+#define RIGHT_SCREEN {GFX_TOP, GFX_RIGHT}
 #define ALT_SCREEN {GFX_BOTTOM, GFX_LEFT}
 
 typedef C3D_RenderTarget RenderTarget;

@@ -18,6 +18,7 @@ namespace Renderer {
 	void fini();
 
 	/// For 3DS or any other supported platform
+	bool is3DEnabled();
 	float get3D();
 
 	void frameStart();

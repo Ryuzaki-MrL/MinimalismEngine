@@ -58,6 +58,10 @@ void fini() {
 	gfxExit();
 }
 
+bool is3DEnabled() {
+	return (osGet3DSliderState() != 0.f);
+}
+
 float get3D() {
 	return osGet3DSliderState() * s_3dside;
 }

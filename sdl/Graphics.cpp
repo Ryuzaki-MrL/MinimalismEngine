@@ -61,6 +61,10 @@ void fini() {
 	SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
+bool is3DEnabled() {
+	return false;
+}
+
 float get3D() {
 	return 0.f;
 }

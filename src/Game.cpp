@@ -46,8 +46,9 @@ void Game::setStateWithFade(GameState* st, seconds_t time) {
 
 void Game::draw() {
 	Renderer::frameStart();
-	state->draw();
 	fadeUpdate();
+	state->draw();
+	fadeApply();
 	Renderer::frameEnd();
 
 	// fps

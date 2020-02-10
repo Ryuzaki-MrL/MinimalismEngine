@@ -119,8 +119,6 @@ void Scene::update() {
 }
 
 void Scene::draw() {
-	Renderer::drawTileMap(tilemap, camera.getViewport());
-
 	for (size_t i : pool.getActiveList()) {
 		pool[i]->draw();
 	}

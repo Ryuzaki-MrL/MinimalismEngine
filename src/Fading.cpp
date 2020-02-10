@@ -38,7 +38,9 @@ void fadeUpdate() {
 			ctx.color.c.a = progress;
 		}
 	}
+}
 
+void fadeApply() {
 	Renderer::targetBlend(ctx.color.rgba);
 }
 
