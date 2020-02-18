@@ -25,7 +25,7 @@ ifneq ($(strip $(USE_SDL)),)
 	ENGINESRC += sdl
 endif
 
-CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
+CFLAGS	:=	-g -Wall -Wno-unused-parameter -O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	-D__SWITCH__ $(INCLUDE)

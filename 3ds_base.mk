@@ -19,7 +19,7 @@ DEFINES	:=	$(ENGINE_DEFINES) $(GAME_DEFINES)
 ENGINEDIR := $(GAMEDIR)/MinimalismEngine
 ENGINESRC := src src/util 3ds
 
-CFLAGS	:=	-g -Wall -Wextra -Wno-psabi -O2 -mword-relocations \
+CFLAGS	:=	-g -Wall -Wextra -Wno-unused-parameter -Wno-psabi -O2 -mword-relocations \
 			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH) $(DEFINES)
 

@@ -14,15 +14,14 @@ endif
 CC := gcc
 CXX := g++
 
-CFLAGS	:=	-g -Wall -Wextra -Wno-sign-compare -Wno-unused-parameter -O2 \
+CFLAGS	:=	-s -Wall -Wextra -Wno-sign-compare -Wno-unused-parameter -O2 \
 			-fomit-frame-pointer -ffunction-sections \
+			-mwindows -D_WINDOWS -DAPP_TITLE='"$(APP_TITLE)"' \
 			$(DEFINES)
 
-CFLAGS	+=	$(INCLUDE) -mwindows -D_WINDOWS -DAPP_TITLE='"$(APP_TITLE)"'
+CXXFLAGS := $(CFLAGS) $(INCLUDE) -fno-rtti -fno-exceptions -std=gnu++11
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
-
-LIBS	:= $(EXTRA_LIBS) -lmingw32
+LIBS	:=  $(EXTRA_LIBS) -lmingw32
 
 ifneq ($(strip $(USE_SDL)),)
 	CXXFLAGS += -D_USE_SDL
