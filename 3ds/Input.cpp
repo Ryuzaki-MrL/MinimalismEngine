@@ -13,10 +13,18 @@ static touchPosition touch;
 static circlePosition cpad[2];
 static accelVector accel;
 static angularRate gyro;
+static bool isNew3DS;
 
 static button_t kBinds[MAX_KEYBINDS];
 
-bool init() {
+bool init(uint16_t feats) {
+	if (feats & INPUT_MOTION) {
+		Motion::setAccelState(true);
+		Motion::setGyroState(true);
+	}
+	
+	APT_CheckNew3DS(&isNew3DS);
+
 	return R_SUCCEEDED(hidInit());
 }
 
@@ -31,99 +39,116 @@ void poll() {
 	kHeld = hidKeysHeld();
 	kUp = hidKeysUp();
 
-	hidCircleRead(&cpad[0]);
-	irrstCstickRead(&cpad[1]);
+	hidCircleRead(&cpad[STICK_LEFT]);
+	irrstCstickRead(&cpad[STICK_RIGHT]);
 	hidTouchRead(&touch);
 	hidAccelRead(&accel);
 	hidGyroRead(&gyro);
 }
 
-bool isKeyDown(button_t key) {
-	return (kDown & key);
-}
 
-bool isKeyBindDown(uint16_t index) {
-	return (kDown & kBinds[index]);
-}
+namespace Keyboard
+{
+	bool isKeyDown(kbkey_t key) { return (kDown & key); }
+	bool isKeyHeld(kbkey_t key) { return (kHeld & key); }
+	bool isKeyUp(kbkey_t key)   { return (kUp & key);   }
 
-bool isKeyHeld(button_t key) {
-	return (kHeld & key);
-}
+	bool isKeyBindDown(uint16_t index) { return (kDown & kBinds[index]); }
+	bool isKeyBindHeld(uint16_t index) { return (kHeld & kBinds[index]); }
+	bool isKeyBindUp(uint16_t index)   { return (kUp & kBinds[index]);   }
 
-bool isKeyBindHeld(uint16_t index) {
-	return (kHeld & kBinds[index]);
-}
-
-bool isKeyUp(button_t key) {
-	return (kUp & key);
-}
-
-bool isKeyBindUp(uint16_t index) {
-	return (kUp & kBinds[index]);
-}
-
-void keyBind(uint16_t index, button_t key) {
-	kBinds[index] = key;
-}
-
-void keyUnbind(uint16_t index) {
-	kBinds[index] = 0;
-}
-
-uint16_t getTouchX() {
-	return touch.px;
-}
-
-uint16_t getTouchY() {
-	return touch.py;
-}
-
-axis_t getStickAxisX(uint8_t stick) {
-	return cpad[stick].dx;
-}
-
-axis_t getStickAxisY(uint8_t stick) {
-	return cpad[stick].dy;
-}
-
-axis_t getAccelX() {
-	return accel.x;
-}
-
-axis_t getAccelY() {
-	return accel.y;
-}
-
-axis_t getAccelZ() {
-	return accel.z;
-}
-
-void setAccelState(bool state) {
-	if (state) {
-		HIDUSER_EnableAccelerometer();
-	} else {
-		HIDUSER_DisableAccelerometer();
+	void keyBind(uint16_t index, kbkey_t key) {
+		kBinds[index] = key;
 	}
-}
 
-axis_t getGyroX() {
-	return gyro.x;
-}
-
-axis_t getGyroY() {
-	return gyro.y;
-}
-
-axis_t getGyroZ() {
-	return gyro.z;
-}
-
-void setGyroState(bool state) {
-	if (state) {
-		HIDUSER_EnableGyroscope();
-	} else {
-		HIDUSER_DisableGyroscope();
+	void keyUnbind(uint16_t index, kbkey_t) {
+		kBinds[index] = 0;
 	}
+};
+
+
+namespace Mouse
+{
+	bool isDown(mbutton_t) { return (kDown & KEY_TOUCH); }
+	bool isHeld(mbutton_t) { return (kHeld & KEY_TOUCH); }
+	bool isUp(mbutton_t)   { return (kUp & KEY_TOUCH);   }
+
+	coord_t getX() { return touch.px; }
+	coord_t getY() { return touch.py; }
+};
+
+
+namespace Touch
+{
+	coord_t getX(uint8_t) { return touch.px; }
+	coord_t getY(uint8_t) { return touch.py; }
+};
+
+
+namespace Gamepad
+{
+	bool init(uint8_t) {}
+	void fini(uint8_t) {}
+	bool isConnected(uint8_t) { return true; }
+
+	void poll(uint8_t) {}
+
+	bool isButtonDown(button_t key, uint8_t) { return (kDown & key); }
+	bool isButtonHeld(button_t key, uint8_t) { return (kHeld & key); }
+	bool isButtonUp(button_t key, uint8_t)   { return (kUp & key);   }
+
+	bool buttonAny(uint8_t) {
+		return (kDown != 0);
+	}
+
+	const char* getDeviceName(uint8_t) {
+		return (isNew3DS) ? "New Nintendo 3DS" : "Nintendo 3DS";
+	}
+
+	const char* getButtonName(button_t, uint8_t) {
+		return "";
+	}
+
+	axis_t getStickAxisX(uint8_t stick, uint8_t) {
+		return cpad[stick].dx;
+	}
+
+	axis_t getStickAxisY(uint8_t stick, uint8_t) {
+		return cpad[stick].dy;
+	}
+};
+
+
+namespace Motion
+{
+	axis_t getAccelX() { return accel.x; }
+	axis_t getAccelY() { return accel.y; }
+	axis_t getAccelZ() { return accel.z; }
+
+	void setAccelState(bool state) {
+		if (state) {
+			HIDUSER_EnableAccelerometer();
+		} else {
+			HIDUSER_DisableAccelerometer();
+		}
+	}
+
+	axis_t getGyroX() { return gyro.x; }
+	axis_t getGyroY() { return gyro.y; }
+	axis_t getGyroZ() { return gyro.z; }
+
+	void setGyroState(bool state) {
+		if (state) {
+			HIDUSER_EnableGyroscope();
+		} else {
+			HIDUSER_DisableGyroscope();
+		}
+	}
+};
+
+
+bool swkbd() {
+	return true;
 }
 
 bool getString(char* out, const char* htext, const char* def, size_t maxlength, bool password) {

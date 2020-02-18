@@ -4,20 +4,54 @@
 
 #include "Input.h"
 
+#define MAX_CONTROLLERS 8
+
 namespace Input {
 
-static button_t kDown;
-static button_t kHeld;
-static button_t kUp;
-static touchPosition touch;
-static JoystickPosition joypad[2];
-static SixAxisSensorValues sas;
+struct ControllerState {
+	button_t kDown;
+	button_t kHeld;
+	button_t kUp;
+	JoystickPosition joypad[2];
+	SixAxisSensorValues sas;
 
-static button_t kBinds[MAX_KEYBINDS];
+	inline void poll(uint8_t gpad) {
+		HidControllerID id = HidControllerID(gpad);
+		kDown = hidKeysDown(id);
+		kHeld = hidKeysHeld(id);
+		kUp   = hidKeysUp(id);
 
-bool init() {
+		hidJoystickRead(&joypad[STICK_LEFT], id, JOYSTICK_LEFT);
+		hidJoystickRead(&joypad[STICK_RIGHT], id, JOYSTICK_RIGHT);
+
+		hidSixAxisSensorValuesRead(&sas, id, 1);
+	}
+};
+
+struct MouseState {
+	mbutton_t mDown;
+	mbutton_t mHeld;
+	mbutton_t mUp;
+	MousePosition pos;
+
+	inline void poll() {
+		mDown = hidMouseButtonsDown();
+		mHeld = hidMouseButtonsHeld();
+		mUp   = hidMouseButtonsUp();
+		hidMouseRead(&pos);
+	}
+};
+
+static ControllerState ctrl[MAX_CONTROLLERS];
+static touchPosition touch[16];
+static MouseState mouse;
+
+static kbkey_t kBinds[MAX_KEYBINDS];
+
+bool init(uint16_t feats) {
 	hidInitialize();
-	//hidInitializeSevenSixAxisSensor();
+	if (feats & INPUT_MOTION)
+		hidInitializeSevenSixAxisSensor();
 	return true;
 }
 
@@ -29,102 +63,141 @@ void fini() {
 void poll() {
 	hidScanInput();
 
-	kDown = hidKeysDown(CONTROLLER_P1_AUTO);
-	kHeld = hidKeysHeld(CONTROLLER_P1_AUTO);
-	kUp = hidKeysUp(CONTROLLER_P1_AUTO);
+	ctrl[GP0].poll(CONTROLLER_P1_AUTO);
 
-	hidJoystickRead(&joypad[0], CONTROLLER_P1_AUTO, JOYSTICK_LEFT);
-	hidJoystickRead(&joypad[1], CONTROLLER_P1_AUTO, JOYSTICK_RIGHT);
-	hidTouchRead(&touch, 0);
-	hidSixAxisSensorValuesRead(&sas, CONTROLLER_P1_AUTO, 1);
-}
-
-bool isKeyDown(button_t key) {
-	return (kDown & key);
-}
-
-bool isKeyBindDown(uint16_t index) {
-	return (kDown & kBinds[index]);
-}
-
-bool isKeyHeld(button_t key) {
-	return (kHeld & key);
-}
-
-bool isKeyBindHeld(uint16_t index) {
-	return (kHeld & kBinds[index]);
-}
-
-bool isKeyUp(button_t key) {
-	return (kUp & key);
-}
-
-bool isKeyBindUp(uint16_t index) {
-	return (kUp & kBinds[index]);
-}
-
-void keyBind(uint16_t index, button_t key) {
-	kBinds[index] = key;
-}
-
-void keyUnbind(uint16_t index) {
-	kBinds[index] = 0;
-}
-
-uint16_t getTouchX() {
-	return touch.px;
-}
-
-uint16_t getTouchY() {
-	return touch.py;
-}
-
-axis_t getStickAxisX(uint8_t stick) {
-	return joypad[stick].dx;
-}
-
-axis_t getStickAxisY(uint8_t stick) {
-	return joypad[stick].dy;
-}
-
-axis_t getAccelX() {
-	return sas.accelerometer.x;
-}
-
-axis_t getAccelY() {
-	return sas.accelerometer.y;
-}
-
-axis_t getAccelZ() {
-	return sas.accelerometer.z;
-}
-
-void setAccelState(bool state) {
-	if (state) {
-		hidStartSevenSixAxisSensor();
-	} else {
-		hidStopSevenSixAxisSensor();
+	for (uint32_t i = 0; i < hidTouchCount(); ++i) {
+		hidTouchRead(&touch[i], i);
 	}
+
+	mouse.poll();
 }
 
-axis_t getGyroX() {
-	return sas.gyroscope.x;
-}
 
-axis_t getGyroY() {
-	return sas.gyroscope.y;
-}
+namespace Keyboard
+{
+	bool isKeyDown(kbkey_t key) { return hidKeyboardDown(key); }
+	bool isKeyHeld(kbkey_t key) { return hidKeyboardHeld(key); }
+	bool isKeyUp(kbkey_t key)   { return hidKeyboardUp(key);   }
 
-axis_t getGyroZ() {
-	return sas.gyroscope.z;
-}
+	bool isKeyBindDown(uint16_t index) { return hidKeyboardDown(kBinds[index]); }
+	bool isKeyBindHeld(uint16_t index) { return hidKeyboardHeld(kBinds[index]); }
+	bool isKeyBindUp(uint16_t index)   { return hidKeyboardUp(kBinds[index]);   }
 
-void setGyroState(bool state) {
-	if (state) {
-		hidStartSevenSixAxisSensor();
-	} else {
-		hidStopSevenSixAxisSensor();
+	void keyBind(uint16_t index, kbkey_t key) {
+		kBinds[index] = key;
 	}
+
+	void keyUnbind(uint16_t index, kbkey_t) {
+		kBinds[index] = KBD_NONE;
+	}
+};
+
+
+namespace Mouse
+{
+	bool isDown(mbutton_t mb) { return (mouse.mDown & mb); }
+	bool isHeld(mbutton_t mb) { return (mouse.mHeld & mb); }
+	bool isUp(mbutton_t mb)   { return (mouse.mUp & mb);   }
+
+	coord_t getX() { return (mouse.pos.x); }
+	coord_t getY() { return (mouse.pos.y); }
+};
+
+
+namespace Touch
+{
+	coord_t getX(uint8_t tpoint) { return touch[tpoint].px; }
+	coord_t getY(uint8_t tpoint) { return touch[tpoint].py; }
+};
+
+
+namespace Gamepad
+{
+	bool init(uint8_t) {
+		return true;
+	}
+
+	void fini(uint8_t) {}
+
+	bool isConnected(uint8_t gpad) {
+		return hidIsControllerConnected(HidControllerID(gpad));
+	}
+
+	void poll(uint8_t gpad) {
+		ctrl[gpad].poll(gpad);
+	}
+
+	bool isButtonDown(button_t key, uint8_t gpad) {
+		return (ctrl[gpad].kDown & key);
+	}
+
+	bool isButtonHeld(button_t key, uint8_t gpad) {
+		return (ctrl[gpad].kHeld & key);
+	}
+
+	bool isButtonUp(button_t key, uint8_t gpad) {
+		return (ctrl[gpad].kUp & key);
+	}
+
+	bool buttonAny(uint8_t gpad) {
+		return (ctrl[gpad].kHeld != 0);
+	}
+
+	const char* getDeviceName(uint8_t gpad) {
+		switch(hidGetControllerType(HidControllerID(gpad))) {
+			case TYPE_PROCONTROLLER: return "Nintendo Switch Pro Controller";
+			case TYPE_HANDHELD: return "Nintendo Switch (Handheld Mode)";
+			case TYPE_JOYCON_PAIR: return "Joycon Controller";
+			case TYPE_JOYCON_LEFT: return "Joycon (Left)";
+			case TYPE_JOYCON_RIGHT: return "Joycon (Right)";
+			default: return "Unknown";
+		}
+	}
+
+	const char* getButtonName(button_t, uint8_t) {
+		return "";
+	}
+
+	axis_t getStickAxisX(uint8_t stick, uint8_t gpad) {
+		return ctrl[gpad].joypad[stick].dx;
+	}
+
+	axis_t getStickAxisY(uint8_t stick, uint8_t gpad) {
+		return ctrl[gpad].joypad[stick].dy;
+	}
+};
+
+
+namespace Motion
+{
+	axis_t getAccelX() { return ctrl[GP0].sas.accelerometer.x; }
+	axis_t getAccelY() { return ctrl[GP0].sas.accelerometer.y; }
+	axis_t getAccelZ() { return ctrl[GP0].sas.accelerometer.z; }
+
+	void setAccelState(bool state) {
+		if (state) {
+			hidStartSevenSixAxisSensor();
+		} else {
+			hidStopSevenSixAxisSensor();
+		}
+	}
+
+	axis_t getGyroX() { return ctrl[GP0].sas.gyroscope.x; }
+	axis_t getGyroY() { return ctrl[GP0].sas.gyroscope.y; }
+	axis_t getGyroZ() { return ctrl[GP0].sas.gyroscope.z; }
+
+	void setGyroState(bool state) {
+		if (state) {
+			hidStartSevenSixAxisSensor();
+		} else {
+			hidStopSevenSixAxisSensor();
+		}
+	}
+};
+
+
+bool swkbd() {
+	return true;
 }
 
 bool getString(char* out, const char* htext, const char* def, size_t maxlength, bool password) {

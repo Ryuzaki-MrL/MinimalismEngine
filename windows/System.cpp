@@ -8,6 +8,8 @@
 #include "System.h"
 #include "PollEvent.h"
 
+// TODO: keyboard text mode (SDL_StartTextInput)
+
 namespace System {
 
 static char userbasepath[260] = "";
@@ -37,6 +39,11 @@ bool loop() {
 			case SDL_KEYUP:
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEBUTTONUP:
+			case SDL_CONTROLLERBUTTONDOWN:
+			case SDL_CONTROLLERBUTTONUP:
+			case SDL_CONTROLLERAXISMOTION:
+			case SDL_CONTROLLERDEVICEADDED:
+			case SDL_CONTROLLERDEVICEREMOVED:
 				inputPollEvent(event);
 				break;
 			
