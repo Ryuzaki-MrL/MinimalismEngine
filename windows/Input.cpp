@@ -11,29 +11,35 @@
 // TODO: support generic joypads (SDL_Joypad)
 // TODO: gamepad deadzone
 
-struct MousePoint { coord_t px, py; };
-struct AxisPoint  { axis_t  dx, dy; };
+struct MouseState {
+	uint32_t mDown;
+	uint32_t mUp;
+	uint32_t mHeld;
+	uint32_t mDownFlag;
+	uint32_t mUpFlag;
+	coord_t px, py;
+};
 
 struct ControllerState {
 	SDL_GameController* handle = nullptr;
 	SDL_JoystickID joy_id;
 
 	bool bDown[SDL_CONTROLLER_BUTTON_MAX];
-	bool bDownFlag[SDL_CONTROLLER_BUTTON_MAX];
 	bool bUp[SDL_CONTROLLER_BUTTON_MAX];
-	bool bUpFlag[SDL_CONTROLLER_BUTTON_MAX];
 	bool bHeld[SDL_CONTROLLER_BUTTON_MAX];
+	bool bDownFlag[SDL_CONTROLLER_BUTTON_MAX];
+	bool bUpFlag[SDL_CONTROLLER_BUTTON_MAX];
 	uint16_t bAny = 0;
 
 	axis_t axis[SDL_CONTROLLER_AXIS_MAX];
 };
 
 static uint8_t kDown[0x200];
-static uint8_t kDownFlag[0x200];
 static uint8_t kUp[0x200];
+static uint8_t kDownFlag[0x200];
 static uint8_t kUpFlag[0x200];
 static const uint8_t* kHeld = kDown;
-static MousePoint mouse;
+static MouseState mouse;
 
 static kbkey_t kBinds[MAX_KEYBINDS];
 
@@ -53,10 +59,9 @@ void searchFirstGamepad() {
 }
 
 void inputPollEvent(SDL_Event e) {
-	kbkey_t sc = e.key.keysym.scancode;
-
 	switch(e.type) {
 		case SDL_KEYDOWN: {
+			kbkey_t sc = e.key.keysym.scancode;
 			if (!kDownFlag[sc]) {
 				kDown[sc] = kDownFlag[sc] = true;
 				kUpFlag[sc] = false;
@@ -64,6 +69,7 @@ void inputPollEvent(SDL_Event e) {
 			break;
 		}
 		case SDL_KEYUP: {
+			kbkey_t sc = e.key.keysym.scancode;
 			if (!kUpFlag[sc]) {
 				kUp[sc] = kUpFlag[sc] = true;
 				kDownFlag[sc] = false;
@@ -71,9 +77,24 @@ void inputPollEvent(SDL_Event e) {
 			break;
 		}
 
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
+		case SDL_MOUSEBUTTONDOWN: {
+			uint32_t index = (1 << e.button.button);
+			if (!(mouse.mDownFlag & index)) {
+				mouse.mDown |= index;
+				mouse.mDownFlag |= index;
+				mouse.mUpFlag &= ~index;
+			}
 			break;
+		}
+		case SDL_MOUSEBUTTONUP: {
+			uint32_t index = (1 << e.button.button);
+			if (!(mouse.mUpFlag & index)) {
+				mouse.mUp |= index;
+				mouse.mUpFlag |= index;
+				mouse.mDownFlag &= ~index;
+			}
+			break;
+		}
 		
 		case SDL_CONTROLLERBUTTONDOWN: {
 			uint8_t gp = gp_devices[e.cbutton.which];
@@ -105,7 +126,6 @@ void inputPollEvent(SDL_Event e) {
 		
 		case SDL_CONTROLLERDEVICEADDED: {
 			Input::Gamepad::init(e.cdevice.which);
-			printf("New device: %s\n", Input::Gamepad::getDeviceName(e.cdevice.which));
 			break;
 		}
 		case SDL_CONTROLLERDEVICEREMOVED: {
@@ -150,7 +170,7 @@ void fini() {
 void poll() {
 	SDL_PumpEvents();
 	kHeld = SDL_GetKeyboardState(NULL);
-	SDL_GetMouseState(&mouse.px, &mouse.py);
+	mouse.mHeld = SDL_GetMouseState(&mouse.px, &mouse.py);
 }
 
 namespace Keyboard
@@ -175,9 +195,9 @@ namespace Keyboard
 
 namespace Mouse
 {
-	bool isDown(mbutton_t) { return false; }
-	bool isHeld(mbutton_t) { return false; }
-	bool isUp(mbutton_t)   { return false; }
+	bool isDown(mbutton_t mb) { return (mouse.mDown & mb); }
+	bool isHeld(mbutton_t mb) { return (mouse.mHeld & mb); }
+	bool isUp(mbutton_t mb)   { return (mouse.mUp   & mb); }
 
 	coord_t getX() { return mouse.px; }
 	coord_t getY() { return mouse.py; }
