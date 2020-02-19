@@ -14,11 +14,13 @@
 #define INPUT_MOUSE		(1 << 1)
 #define INPUT_GAMEPAD	(1 << 2)
 #define INPUT_MOTION 	(1 << 3)
+#define INPUT_RUMBLE	(1 << 4)
 
 enum { GP0, GP1, GP2, GP3 };
 enum { STICK_LEFT, STICK_RIGHT };
 
 // TODO: bind multiple keys to the same slot
+// TODO: rumble devices support
 // TODO: init features as needed
 
 namespace Input
@@ -39,6 +41,8 @@ namespace Input
 
 		void keyBind(uint16_t index, kbkey_t);
 		void keyUnbind(uint16_t index, kbkey_t);
+
+		const char* getKeyName(kbkey_t);
 	};
 
 	namespace Mouse
@@ -75,8 +79,7 @@ namespace Input
 
 		axis_t getStickAxisX(uint8_t stick, uint8_t gpad = GPD);
 		axis_t getStickAxisY(uint8_t stick, uint8_t gpad = GPD);
-
-		// TODO: rumble and triggers
+		//axis_t getTrigger(uint8_t trigger, uint8_t gpad = GPD);
 	};
 
 	namespace Motion

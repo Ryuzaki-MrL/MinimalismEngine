@@ -190,6 +190,10 @@ namespace Keyboard
 	void keyUnbind(uint16_t index, kbkey_t) {
 		kBinds[index] = SDL_SCANCODE_UNKNOWN;
 	}
+
+	const char* getKeyName(kbkey_t key) {
+		return SDL_GetScancodeName(key);
+	}
 };
 
 

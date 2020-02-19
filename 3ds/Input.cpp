@@ -64,6 +64,10 @@ namespace Keyboard
 	void keyUnbind(uint16_t index, kbkey_t) {
 		kBinds[index] = 0;
 	}
+
+	const char* getKeyName(kbkey_t key) {
+		return Gamepad::getButtonName(key);
+	}
 };
 
 
@@ -105,8 +109,18 @@ namespace Gamepad
 		return (isNew3DS) ? "New Nintendo 3DS" : "Nintendo 3DS";
 	}
 
-	const char* getButtonName(button_t, uint8_t) {
-		return "";
+	const char* getButtonName(button_t key, uint8_t) {
+		static const char* names_[] = {
+			"None", "A", "B", "Select", "Start",
+			"D-Right", "D-Left", "D-Up", "D-Down",
+			"R", "L", "X", "Y", "", "", "ZL", "ZR",
+			"", "", "", "", "", "", "", "",
+			"S-Right", "S-Left", "S-Up", "S-Down",
+			"C-Right", "C-Left", "C-up", "C-Down"
+		};
+		int index = 0;
+		while(key) { ++index; key >>= 1; }
+		return names_[index];
 	}
 
 	axis_t getStickAxisX(uint8_t stick, uint8_t) {

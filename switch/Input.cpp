@@ -90,6 +90,10 @@ namespace Keyboard
 	void keyUnbind(uint16_t index, kbkey_t) {
 		kBinds[index] = KBD_NONE;
 	}
+
+	const char* getKeyName(kbkey_t) {
+		return "";
+	}
 };
 
 
@@ -154,8 +158,18 @@ namespace Gamepad
 		}
 	}
 
-	const char* getButtonName(button_t, uint8_t) {
-		return "";
+	const char* getButtonName(button_t key, uint8_t) {
+		static const char* names_[] = {
+			"None", "A", "B", "X", "Y", "L-Stick", "R-Stick",
+			"L", "R", "ZL", "ZR", "Plus", "Minus",
+			"D-Left", "D-Up", "D-Right", "D-Down",
+			"L-Left", "L-Up", "L-Right", "L-Down",
+			"R-Left", "R-Up", "R-Right", "R-Down",
+			"SL", "SR", "SL", "SR", "", "", "", ""
+		};
+		int index = 0;
+		while(key) { ++index; key >>= 1; }
+		return names_[index];
 	}
 
 	axis_t getStickAxisX(uint8_t stick, uint8_t gpad) {
