@@ -8,6 +8,10 @@
 #include "System.h"
 #include "PollEvent.h"
 
+#ifndef ROOT_DATA_PATH
+#define ROOT_DATA_PATH "./romfs/"
+#endif
+
 // TODO: keyboard text mode (SDL_StartTextInput)
 
 namespace System {
@@ -84,7 +88,7 @@ uint64_t getFrequency() {
 }
 
 const char* getRootPath() {
-	return "./romfs/";
+	return ROOT_DATA_PATH;
 }
 
 const char* getUserPath() {
