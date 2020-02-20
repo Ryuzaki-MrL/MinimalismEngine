@@ -19,7 +19,7 @@ CFLAGS	:=	-s -Wall -Wextra -Wno-sign-compare -Wno-unused-parameter -O2 \
 			-mwindows -D_WINDOWS -DAPP_TITLE='"$(APP_TITLE)"' \
 			$(DEFINES)
 
-CXXFLAGS := $(CFLAGS) $(INCLUDE) -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS := $(CFLAGS) $(INCLUDE) -fno-rtti -fno-exceptions -std=gnu++11 -static-libstdc++ -static-libgcc
 
 LIBS	:=  $(EXTRA_LIBS) -lmingw32
 
