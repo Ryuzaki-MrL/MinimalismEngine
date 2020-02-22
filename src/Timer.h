@@ -14,10 +14,12 @@ typedef float seconds_t;
 typedef uint64_t ticks_t;
 
 class Timer {
+  private:
+	ticks_t tstart;
   public:
 	seconds_t tend;
   private:
-	ticks_t tstart;
+	seconds_t ts;
 	uint8_t state;
 
   public:
