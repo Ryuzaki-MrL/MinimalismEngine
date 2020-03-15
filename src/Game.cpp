@@ -20,12 +20,17 @@ void Game::update(seconds_t delta) {
 	if (transition) {
 		switch(fadeStatus()) {
 			case FADE_HALFDONE:
-				if (state != tmpstate) setState(tmpstate);
+				if (tmpstate) {
+					setState(tmpstate);
+					tmpstate = nullptr;
+				}
 				break;
 			case FADE_DONE:
-				transition = false; break;
+				transition = false;
+				break;
 		}
-	} else {
+	}
+	else {
 		g_deltatime = delta;
 		Input::poll();
 		state->update();
@@ -34,7 +39,9 @@ void Game::update(seconds_t delta) {
 }
 
 void Game::setState(GameState* st) {
-	if (state) delete state;
+	if (state && state != st) {
+		delete state;
+	}
 	state = st;
 }
 
